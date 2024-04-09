@@ -11,35 +11,35 @@ class Steuerung: # control
         #t=math.floor(time * 10) / 10
         t=round(time,2)
         if t == self.start:
-            self.last_u_recht = 0
+            self.last_u_recht = 0 #5
         elif t == self.stop:
             self.last_u_recht = self.U
         elif t == 5:
             self.last_u_recht = 0
         elif t == 6:
-            self.last_u_recht = 0
+            self.last_u_recht = 0 #-1.2
         elif t == 7.9:
-            self.last_u_recht = 0
+            self.last_u_recht = 0 #0
         elif t == 10:
-            self.last_u_recht = 0
+            self.last_u_recht = 0 #5
         elif t == 15:
-            self.last_u_recht = 0
+            self.last_u_recht = 0 #0
         elif t == 16:
-            self.last_u_recht = 0
+            self.last_u_recht = 0 #-1.2
         elif t == 17.9:
-            self.last_u_recht = 0
+            self.last_u_recht = 0 #0
         elif t == 20:
-            self.last_u_recht = 0
+            self.last_u_recht = 0 #5
         elif t == 25:
-            self.last_u_recht = 0
+            self.last_u_recht = 0 #0
         elif t == 26:
-            self.last_u_recht = 0        
+            self.last_u_recht = 0 #-1.2       
         elif t == 27.9:
-            self.last_u_recht = 0
+            self.last_u_recht = 0 #0
         elif t == 30:
-            self.last_u_recht = 0
+            self.last_u_recht = 0 #5
         elif t == 35:
-            self.last_u_recht = 0
+            self.last_u_recht = 0 #0
 
         return self.last_u_recht
 
@@ -47,35 +47,35 @@ class Steuerung: # control
 
         t=round(time,2)
         if t == self.start:
-            self.last_u_left =0
+            self.last_u_left =0 #5
         elif t == self.stop:
             self.last_u_left = self.U*0.8
         elif t == 5:
-            self.last_u_left = 0
+            self.last_u_left = 0 #0
         elif t == 6:
-            self.last_u_left = 0
+            self.last_u_left = 0 #1
         elif t == 7.9:
-            self.last_u_left = 0
+            self.last_u_left = 0 #0
         elif t == 10:
-            self.last_u_left = 0
+            self.last_u_left = 0 #5
         elif t == 15:
-            self.last_u_left = 0
+            self.last_u_left = 0 #0
         elif t == 16:
-            self.last_u_left = 0
+            self.last_u_left = 0 #1
         elif t == 17.9:
-            self.last_u_left = 0
+            self.last_u_left = 0 #0
         elif t == 20:
-            self.last_u_left = 0
+            self.last_u_left = 0 #5
         elif t == 25:
-            self.last_u_left = 0
+            self.last_u_left = 0 #0
         elif t == 26:
-            self.last_u_left = 0         
+            self.last_u_left = 0 #1     
         elif t == 27.9:
-            self.last_u_left = 0
+            self.last_u_left = 0 #0
         elif t == 30:
-            self.last_u_left = 0
+            self.last_u_left = 0 #5
         elif t == 35:
-            self.last_u_left = 0
+            self.last_u_left = 0 #0
            
        
 
