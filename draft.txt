@@ -1,0 +1,21 @@
+Height = 1830*0.5 = 915
+Width = 1220*0.5 = 610
+
+goal width = 5
+goal height = 350*0.5 = 175
+
+left_goal_x = 0
+right_goal_x = HEIGHT - goal_width = 915 - 5 = 910
+goal_y = (WIDTH - goal_height) // 2 = (610 - 175) // 2 = 217
+
+=> left_goal dimensions = (0, 217)
+=> right_goal dimensions = (910, 217)
+
+pygame.draw.rect(screen, GREEN, [left_goal_x, goal_y, goal_width, goal_height])
+pygame.draw.rect(screen, GREEN, [right_goal_x , goal_y, goal_width, goal_height])
+
+
+if ball_x < (left_goal_x+width) && ball_y > goal_y && ball_y < (goal_y+height):
+    print("Goal scored by right team")
+elif ball_x > right_goal_x && ball_y > goal_y && ball_y < (goal_y+height):
+    print("Goal scored by left team")

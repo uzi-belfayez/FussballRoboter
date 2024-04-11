@@ -1,5 +1,6 @@
 import numpy as np
 import math
+import time
 
 # The signum function returns the sign of a number.
 def signum_block(x):
@@ -7,8 +8,17 @@ def signum_block(x):
 
 class Ball:
     
-    def __init__(self, x, y , vx ,vy  ) -> None:
+    def __init__(self, x, y , vx ,vy, initial_x, initial_y  ) -> None:
         # Initialize the properties of the ball.
+        self.initial_x = initial_x
+        self.initial_y = initial_y
+
+        self.right_team_score = 0
+        self.left_team_score = 0
+
+        self.last_goal_time = 0  # Variable to store the time of the last goal
+        self.goal_delay = 0.1  
+        
         self.Mb = 0.0012  # Ball Mass
         self.Mr = 0.6  # Robot Mass
         
@@ -161,7 +171,39 @@ class Ball:
             self.position[0] = x3_ball
             self.position[1] = y3_ball    
 
+    def score_goal(self, right_goal_x, left_goal_x, goal_y, height, width, ball_radius):
 
+        if time.time() - self.last_goal_time > self.goal_delay:
+            if (self.position[0]-ball_radius < (left_goal_x + width)) & (self.position[1]+ball_radius > goal_y) & (self.position[1]+ball_radius < (goal_y+height)):
+                print("Goal scored by right team")
+                self.right_team_score = self.right_team_score + 1
+                self.position[0] = self.initial_x
+                self.position[1] = self.initial_y
+                self.last_goal_time = time.time()
+            elif (self.position[0]+ball_radius > right_goal_x) & (self.position[1]+ball_radius > goal_y) & (self.position[1]+ball_radius < (goal_y + height)):
+                print("Goal scored by left team")
+                self.left_team_score = self.left_team_score + 1
+                self.position[0] = self.initial_x
+                self.position[1] = self.initial_y
+                self.last_goal_time = time.time()
+        #return right_team_score, left_team_score
+
+
+    def reset(self,x,y,initial_robot_x,initial_robot_y):
+        # Reset the ball to its initial position.
+        self.position[0] = self.initial_x
+        self.position[1] = self.initial_y
+        self.geschwindigkeit[0] = 0
+        self.geschwindigkeit[1] = 0
+        self.right_team_score = 0
+        self.left_team_score = 0
+        self.last_goal_time = 0
+        x = initial_robot_x
+        y = initial_robot_y
+
+
+
+        
 
 
 """ Within the ball_movement function, the simulation begins by calculating the friction of the ball in the x and y directions. The signum_block function [3] is used to determine the sign of the velocity components. If the velocity in the x direction (vx) is positive, it returns 1.0. If vx is negative, it returns -1.0. If vx is zero, it returns 0.0, and the same for vy. This ensures that the velocity and friction have the same sign.
