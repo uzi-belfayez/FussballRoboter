@@ -197,7 +197,7 @@ class Ball:
         #return right_team_score, left_team_score
 
 
-    def reset(self,x,y,initial_robot_x,initial_robot_y):
+    def reset(self):
         # Reset the ball to its initial position.
         self.position[0] = self.initial_x
         self.position[1] = self.initial_y
@@ -206,8 +206,6 @@ class Ball:
         self.right_team_score = 0
         self.left_team_score = 0
         self.last_goal_time = 0
-        x = initial_robot_x
-        y = initial_robot_y
 
 
 

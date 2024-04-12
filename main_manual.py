@@ -19,6 +19,11 @@ def pixelgeschwindigkeit_umrechnen(geschwindigkeit_pixel_s):
     geschwindigkeit_m_s = geschwindigkeit_mm_s / 1000  
     return geschwindigkeit_m_s
 
+def reset(i):
+    robot_x, robot_y = (HEIGHT // 2)+50, (WIDTH // 2)
+    ball.reset()
+    i = 0
+
 
 # --- Pygame Initialization and configuration ---
 
@@ -35,7 +40,7 @@ robot_height = 150 * pixel_scale
 robot_image = Gr.init_robot_image(robot_height, robot_width) 
 robot_x, robot_y = (HEIGHT // 2)+50, (WIDTH // 2)  
 V_max = 9  # Maximum voltage in volts
-t_final=35 # Simulation duration (in seconds)
+t_final=10 # Simulation duration (in seconds)
 dt = 0.05 # Time step for the simulation
 
 # Initial velocity of the ball in the x and y directions in m/s
@@ -86,9 +91,9 @@ while running:
             
     # Update current_angle based on key states
     if key_state.get(pygame.K_LEFT, False):
-        current_angle += 2
+        current_angle += 4
     if key_state.get(pygame.K_RIGHT, False):
-        current_angle -= 2
+        current_angle -= 4
     if key_state.get(pygame.K_UP, False):
         current_speed += 0.1
     if key_state.get(pygame.K_DOWN, False):
@@ -117,6 +122,12 @@ while running:
         robot_x += geschwindigkeit_umrechnen(current_speed) *dt * np.cos(np.radians(current_angle))
         robot_y -= geschwindigkeit_umrechnen(current_speed) *dt *np.sin(np.radians(current_angle))
 
+    # Reseting the robot position after a goal
+        if ball.goal_scored:
+            robot_x, robot_y = (HEIGHT // 2)+50, (WIDTH // 2)
+            ball.goal_scored = False
+
+    # Updating the ball position
         ball.ball_bewegung(dt, ball_radius, HEIGHT, WIDTH,winkel_b)
         ball.ball_wand_kollision_x(HEIGHT, ball_radius )
         ball.ball_wand_kollision_y(WIDTH, ball_radius )
@@ -147,6 +158,17 @@ while running:
         speed_position = (10, 50)
         screen.blit(ball_text, ball_position)
         screen.blit(robot_text, speed_position)
+
+            #display score 
+        score_text = font.render(f"Right team score: {ball.right_team_score} Left team score: {ball.left_team_score}", True, Gr.RED)
+        score_position = (10, 70)
+        screen.blit(score_text, score_position)
+
+        #display the ball coordinates
+        ball_coordinates = font.render(f"Ball coordinates: ({round(ball.position[0])},{round(ball.position[1])})", True, Gr.RED)
+        ball_coordinates_position = (10, 90)
+        screen.blit(ball_coordinates, ball_coordinates_position)
+
 
         pygame.display.flip()  # Updating Displays
         pygame.time.delay(30)  # Pause to slow down the loop

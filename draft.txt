@@ -19,3 +19,18 @@ if ball_x < (left_goal_x+width) && ball_y > goal_y && ball_y < (goal_y+height):
     print("Goal scored by right team")
 elif ball_x > right_goal_x && ball_y > goal_y && ball_y < (goal_y+height):
     print("Goal scored by left team")
+
+
+
+reward system : 
++100 for scoring a goal
+-100 for conceding a goal
+-1 for every step taken
++10 for touching the ball
+-10 for collision with walls 
+
+actions :
+1-go straight 
+2-turn right 
+3-turn left
+4- eliminated the backward movement 
