@@ -12,7 +12,7 @@ class Modell:
     Ku = 0.506  # Back-EMF constant. (in V*s/rad)
    
     dt = 0.05 # Time step (in seconds).
-    t_final = 180 # Simulation duration (in seconds).
+    t_final = 10 # Simulation duration (in seconds).
 
     # Robot dynamics.
     M = 0.6  # Robot Mass

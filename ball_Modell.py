@@ -18,6 +18,8 @@ class Ball:
 
         self.last_goal_time = 0  # Variable to store the time of the last goal
         self.goal_delay = 0.1  
+
+        self.goal_scored = False
         
         self.Mb = 0.0012  # Ball Mass
         self.Mr = 0.6  # Robot Mass
@@ -179,13 +181,19 @@ class Ball:
                 self.right_team_score = self.right_team_score + 1
                 self.position[0] = self.initial_x
                 self.position[1] = self.initial_y
+                self.geschwindigkeit[0] = 0
+                self.geschwindigkeit[1] = 0
                 self.last_goal_time = time.time()
+                self.goal_scored = True
             elif (self.position[0]+ball_radius > right_goal_x) & (self.position[1]+ball_radius > goal_y) & (self.position[1]+ball_radius < (goal_y + height)):
                 print("Goal scored by left team")
                 self.left_team_score = self.left_team_score + 1
                 self.position[0] = self.initial_x
                 self.position[1] = self.initial_y
+                self.geschwindigkeit[0] = 0
+                self.geschwindigkeit[1] = 0
                 self.last_goal_time = time.time()
+                self.goal_scored = True
         #return right_team_score, left_team_score
 
 
