@@ -25,6 +25,14 @@ def reset(i):
     i = 0
 
 
+def out_of_bounds(x,y,w,h):
+    return(x<0 or x>w or y<0 or y>h)
+
+def map_coordinates(x, y, max_x, max_y):
+    mapped_x = max(0, min(x, max_x))
+    mapped_y = max(0, min(y, max_y))
+    return mapped_x, mapped_y
+
 # --- Pygame Initialization and configuration ---
 
 pygame.init()
@@ -88,6 +96,9 @@ while running:
                 key_state[event.key] = True  # Set the key to pressed
             elif event.type == pygame.KEYUP:
                 key_state[event.key] = False  # Set the key to released
+
+    prev_robot_x=robot_x
+    prev_robot_y=robot_y
             
     # Update current_angle based on key states
     if key_state.get(pygame.K_LEFT, False):
@@ -133,6 +144,26 @@ while running:
         ball.ball_bewegung(dt, ball_radius, HEIGHT, WIDTH,winkel_b)
         ball.ball_wand_kollision_x(HEIGHT, ball_radius )
         ball.ball_wand_kollision_y(WIDTH, ball_radius )
+
+    # Robot_wall collision        
+        (x1,y1)=(robot_x + robot_height//2*np.cos(np.radians(current_angle)),robot_y - robot_height//2*np.sin(np.radians(current_angle)))
+        (x2,y2)=(robot_x - robot_height//2*np.cos(np.radians(current_angle)),robot_y + robot_height//2*np.sin(np.radians(current_angle)))
+        (x3,y3)=(robot_x + robot_width//2*np.sin(np.radians(current_angle)),robot_y + robot_width//2*np.cos(np.radians(current_angle)))
+        (x4,y4)=(robot_x - robot_width//2*np.sin(np.radians(current_angle)),robot_y - robot_width//2*np.cos(np.radians(current_angle)))
+        point_list=[(x1,y1),
+                    (x2,y2),
+                    (x3,y3),
+                    (x4,y4),
+                    (x1+ robot_width//2*np.sin(np.radians(current_angle)),y1+ robot_width//2*np.cos(np.radians(current_angle))),
+                    (x1- robot_width//2*np.sin(np.radians(current_angle)),y1- robot_width//2*np.cos(np.radians(current_angle))),
+                    (x2+ robot_width//2*np.sin(np.radians(current_angle)),y2+ robot_width//2*np.cos(np.radians(current_angle))),
+                    (x2- robot_width//2*np.sin(np.radians(current_angle)),y2- robot_width//2*np.cos(np.radians(current_angle)))]
+        #for point in point_list:
+        #    pygame.draw.circle(screen, (255,0,0), point, 5)  # 5 is the radius of the dot
+        for (x,y) in point_list:
+            if out_of_bounds(x,y,HEIGHT,WIDTH):
+                robot_x=prev_robot_x
+                robot_y=prev_robot_y
 
         
         
