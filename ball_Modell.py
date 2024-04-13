@@ -19,13 +19,16 @@ class Ball:
         self.last_goal_time = 0  # Variable to store the time of the last goal
         self.goal_delay = 0.1  
 
-        self.goal_scored = False
+        self.left_goal_scored = False
+        self.right_goal_scored = False
+
+        self.robot_ball_kollision = False
         
         self.Mb = 0.0012  # Ball Mass
         self.Mr = 0.6  # Robot Mass
         
 
-        self.e_w= 1 # Energy loss coefficient during collision with the wall.
+        self.e_w= 0.9 # Energy loss coefficient during collision with the wall.
         self.k_rb = 1   # Energy loss coefficient during collision with the robot.
         self.reibung = 0.2* 9.81  # Frictional force. 
         self.position = np.array([x, y], dtype=float)  # Initial position.
@@ -86,19 +89,19 @@ class Ball:
         robot_vy1 = robot_vx * math.sin(math.radians(winkel)) + robot_vy * np.cos(math.radians(winkel))
         
         # Checking for collision between the ball and the robot.
-        robot_ball_kollision = False
+        self.robot_ball_kollision = False
         if (-robot_height/2 <= x2_ball + ball_radius) and (robot_height/2 >= x2_ball - ball_radius) and (-robot_width/2 <= y2_ball) and (robot_width/2 >= y2_ball):
-            robot_ball_kollision = True
+            self.robot_ball_kollision = True
         elif (-robot_height/2 <= x2_ball) and (robot_height/2 >= x2_ball) and (-robot_width/2 <= y2_ball + ball_radius) and (robot_width/2 >= y2_ball - ball_radius):
-            robot_ball_kollision = True 
+            self.robot_ball_kollision = True 
         elif np.sqrt((robot_height/2 - x2_ball)**2 +  (robot_width/2- y2_ball)**2) <= ball_radius or \
              np.sqrt((-robot_height/2 - x2_ball)**2 +  (robot_width/2- y2_ball)**2) <= ball_radius or \
              np.sqrt((robot_height/2 - x2_ball)**2 +  (-robot_width/2- y2_ball)**2) <= ball_radius or \
              np.sqrt((-robot_height/2 - x2_ball)**2 +  (-robot_width/2- y2_ball)**2) <= ball_radius :       
-             robot_ball_kollision = True
+             self.robot_ball_kollision = True
                           
         # Handling the collision of the ball with the left side of the robot.
-        if robot_ball_kollision:
+        if self.robot_ball_kollision:
             if -robot_height/2 >= x2_ball and -robot_width/2 <= y2_ball and robot_width/2 >= y2_ball:
                 vx1_ball = (vx1_ball * self.Mb + robot_vx1 * self.Mr) / (self.Mb + self.Mr) - ( (vx1_ball-robot_vx1 )*self.k_rb * self.Mr ) / (self.Mb + self.Mr)
                 robot_vx1 =(vx1_ball * self.Mb + robot_vx1 * self.Mr) / (self.Mb + self.Mr) -  ( (robot_vx1- vx1_ball)*self.k_rb * self.Mb ) / (self.Mb + self.Mr)
@@ -184,7 +187,7 @@ class Ball:
                 self.geschwindigkeit[0] = 0
                 self.geschwindigkeit[1] = 0
                 self.last_goal_time = time.time()
-                self.goal_scored = True
+                self.right_goal_scored = True
             elif (self.position[0]+ball_radius > right_goal_x) & (self.position[1]+ball_radius > goal_y) & (self.position[1]+ball_radius < (goal_y + height)):
                 print("Goal scored by left team")
                 self.left_team_score = self.left_team_score + 1
@@ -193,7 +196,7 @@ class Ball:
                 self.geschwindigkeit[0] = 0
                 self.geschwindigkeit[1] = 0
                 self.last_goal_time = time.time()
-                self.goal_scored = True
+                self.left_goal_scored = True
         #return right_team_score, left_team_score
 
 

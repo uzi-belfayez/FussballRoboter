@@ -103,7 +103,7 @@ while running:
     print("speed="+str(current_speed))
     for key, value in key_state.items():
         print(keys[key], "->", value)
-    if abs(current_speed)>=2:
+    if abs(current_speed)>=0.8:
         current_speed=math.copysign(2,current_speed)
     print("phi="+str(current_angle))
     current_angle%=360
@@ -123,9 +123,11 @@ while running:
         robot_y -= geschwindigkeit_umrechnen(current_speed) *dt *np.sin(np.radians(current_angle))
 
     # Reseting the robot position after a goal
-        if ball.goal_scored:
+        if ball.right_goal_scored or ball.left_goal_scored:
             robot_x, robot_y = (HEIGHT // 2)+50, (WIDTH // 2)
-            ball.goal_scored = False
+            current_angle = 0
+            ball.right_goal_scored = False
+            ball.left_goal_scored = False
 
     # Updating the ball position
         ball.ball_bewegung(dt, ball_radius, HEIGHT, WIDTH,winkel_b)
@@ -159,7 +161,7 @@ while running:
         screen.blit(ball_text, ball_position)
         screen.blit(robot_text, speed_position)
 
-            #display score 
+        #display score 
         score_text = font.render(f"Right team score: {ball.right_team_score} Left team score: {ball.left_team_score}", True, Gr.RED)
         score_position = (10, 70)
         screen.blit(score_text, score_position)

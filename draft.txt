@@ -25,9 +25,9 @@ elif ball_x > right_goal_x && ball_y > goal_y && ball_y < (goal_y+height):
 reward system : 
 +100 for scoring a goal
 -100 for conceding a goal
--1 for every step taken
 +10 for touching the ball
 -10 for collision with walls 
+-10 for game_over
 
 actions :
 1-go straight 

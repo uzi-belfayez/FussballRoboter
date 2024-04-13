@@ -37,7 +37,7 @@ def _move(direction):
     
     if direction == Direction.STRAIGHT:
         current_speed += 0.1
-        if abs(current_speed)>=2:
+        if abs(current_speed)>=0.8:
             current_speed=math.copysign(2,current_speed)
     if direction == Direction.RIGHT:
         current_angle += 4
@@ -68,7 +68,17 @@ def play_step(action, frame_iteration):
     if frame_iteration > 1000*(ball.right_team_score+ball.left_team_score):
         game_over = True
         reward = -10
-        return reward, game_over, self.score
+        return reward, game_over
+    
+    if ball.right_goal_scored:    
+        reward = 100
+        return reward, game_over
+    if ball.left_goal_scored:
+        reward = -100
+        return reward, game_over
+    if ball.robot_ball_kollision:
+        reward = 10
+        return reward, game_over
 
 def update_ui():
 
@@ -84,9 +94,12 @@ def update_ui():
         robot_y -= geschwindigkeit_umrechnen(current_speed) *dt *np.sin(np.radians(current_angle))
 
     # Reseting the robot position after a goal
-        if ball.goal_scored:
+        if ball.right_goal_scored or ball.left_goal_scored:
             robot_x, robot_y = (HEIGHT // 2)+50, (WIDTH // 2)
-            ball.goal_scored = False
+            current_angle = 0
+            ball.right_goal_scored = False
+            ball.left_goal_scored = False
+
 
     # Updating the ball position
         ball.ball_bewegung(dt, ball_radius, HEIGHT, WIDTH,winkel_b)
@@ -207,9 +220,12 @@ while running:
         robot_y -= geschwindigkeit_umrechnen(current_speed) *dt *np.sin(np.radians(current_angle))
 
     # Reseting the robot position after a goal
-        if ball.goal_scored:
+        if ball.right_goal_scored or ball.left_goal_scored:
             robot_x, robot_y = (HEIGHT // 2)+50, (WIDTH // 2)
-            ball.goal_scored = False
+            current_angle = 0
+            ball.right_goal_scored = False
+            ball.left_goal_scored = False
+
 
     # Updating the ball position
         ball.ball_bewegung(dt, ball_radius, HEIGHT, WIDTH,winkel_b)
