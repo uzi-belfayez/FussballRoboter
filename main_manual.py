@@ -19,10 +19,14 @@ def pixelgeschwindigkeit_umrechnen(geschwindigkeit_pixel_s):
     geschwindigkeit_m_s = geschwindigkeit_mm_s / 1000  
     return geschwindigkeit_m_s
 
-def reset(i):
-    robot_x, robot_y = (HEIGHT // 2)+50, (WIDTH // 2)
+def reset(i,robot_x,robot_y,current_angle,ball):
+    robot_x, robot_y = (HEIGHT // 2)-50, (WIDTH // 2)
+    current_angle = 0
     ball.reset()
     i = 0
+    ball.right_goal_scored = False
+    ball.left_goal_scored = False
+    return i,robot_x,robot_y
 
 
 def out_of_bounds(x,y,w,h):
@@ -46,7 +50,7 @@ ball_radius = 25 * pixel_scale
 robot_width = 125 * pixel_scale
 robot_height = 150 * pixel_scale
 robot_image = Gr.init_robot_image(robot_height, robot_width) 
-robot_x, robot_y = (HEIGHT // 2)+50, (WIDTH // 2)  
+robot_x, robot_y = (HEIGHT // 2)-50, (WIDTH // 2)  
 V_max = 9  # Maximum voltage in volts
 t_final=10 # Simulation duration (in seconds)
 dt = 0.05 # Time step for the simulation
@@ -65,14 +69,14 @@ Ball_vy = geschwindigkeit_umrechnen(Ball_vy0)
 model = Modell()
 #ball = Ball(HEIGHT // 2, WIDTH // 2, Ball_vx, Ball_vy)
 ball = Ball(HEIGHT // 2, WIDTH // 2, 0, 0,HEIGHT // 2, WIDTH // 2)
-steuerung=Steuerung(0,t_final,V_max)
+#steuerung=Steuerung(0,t_final,V_max)
 # Retrieve various robot data from the robot model
-time, speed, w_right, w_left,v_left,v_right, x, y ,winkel,accel= model.simulate(steuerung.recht,steuerung.link)
+#time, speed, w_right, w_left,v_left,v_right, x, y ,winkel,accel= model.simulate(steuerung.recht,steuerung.link)
 
 # Defining the font for text output
 font = pygame.font.SysFont("Roboto", 20)
 clock = pygame.time.Clock()
-time_data = time
+#time_data = time
 
 
 
@@ -106,22 +110,22 @@ while running:
     if key_state.get(pygame.K_RIGHT, False):
         current_angle -= 4
     if key_state.get(pygame.K_UP, False):
-        current_speed += 0.1
+        current_speed += 0.2
     if key_state.get(pygame.K_DOWN, False):
-        current_speed -= 0.1
+        current_speed -= 0.2
     if not(key_state.get(pygame.K_DOWN, False)) and not(key_state.get(pygame.K_UP, False)):
         current_speed = 0
     print("speed="+str(current_speed))
     for key, value in key_state.items():
         print(keys[key], "->", value)
     if abs(current_speed)>=0.8:
-        current_speed=math.copysign(2,current_speed)
+        current_speed=math.copysign(0.8,current_speed)
     print("phi="+str(current_angle))
     current_angle%=360
     # Graphics
     # Fill screen background
     screen.fill(Gr.BLACK)
-    if i < len(time_data):
+    if i < 1000000:
         screen.fill(Gr.BLACK)
     # Drawing the game field
         Gr.draw_field()
@@ -135,10 +139,11 @@ while running:
 
     # Reseting the robot position after a goal
         if ball.right_goal_scored or ball.left_goal_scored:
-            robot_x, robot_y = (HEIGHT // 2)+50, (WIDTH // 2)
+            robot_x, robot_y = (HEIGHT // 2)-50, (WIDTH // 2)
             current_angle = 0
             ball.right_goal_scored = False
             ball.left_goal_scored = False
+            #i, robot_x, robot_y, current_angle=reset(i,robot_x,robot_y, current_angle, ball)
 
     # Updating the ball position
         ball.ball_bewegung(dt, ball_radius, HEIGHT, WIDTH,winkel_b)
