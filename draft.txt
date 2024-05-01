@@ -34,3 +34,9 @@ actions :
 2-turn right 
 3-turn left
 4- eliminated the backward movement 
+
+
+
+------NEURAL NETWORK ---------------
+example :   input : robot_x , robot_y , ball_x , ball_y
+            output : move_straight , rotate_left , rotate_right

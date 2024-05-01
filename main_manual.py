@@ -66,7 +66,7 @@ Ball_vx = geschwindigkeit_umrechnen(Ball_vx0)
 Ball_vy = geschwindigkeit_umrechnen(Ball_vy0)
 
 # Creating model, ball, and controller
-model = Modell()
+#model = Modell()
 #ball = Ball(HEIGHT // 2, WIDTH // 2, Ball_vx, Ball_vy)
 ball = Ball(HEIGHT // 2, WIDTH // 2, 0, 0,HEIGHT // 2, WIDTH // 2)
 #steuerung=Steuerung(0,t_final,V_max)
@@ -146,7 +146,7 @@ while running:
             #i, robot_x, robot_y, current_angle=reset(i,robot_x,robot_y, current_angle, ball)
 
     # Updating the ball position
-        ball.ball_bewegung(dt, ball_radius, HEIGHT, WIDTH,winkel_b)
+        ball.ball_bewegung(dt, ball_radius, HEIGHT, WIDTH,0)
         ball.ball_wand_kollision_x(HEIGHT, ball_radius )
         ball.ball_wand_kollision_y(WIDTH, ball_radius )
 

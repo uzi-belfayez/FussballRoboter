@@ -38,7 +38,7 @@ def _move(direction):
     if direction == Direction.STRAIGHT:
         current_speed += 0.1
         if abs(current_speed)>=0.8:
-            current_speed=math.copysign(2,current_speed)
+            current_speed=math.copysign(0.8,current_speed)
     if direction == Direction.RIGHT:
         current_angle += 4
     if direction == Direction.LEFT:
@@ -78,8 +78,10 @@ def play_step(action, frame_iteration):
         return reward, game_over
     if ball.robot_ball_kollision:
         reward = 10
+        ball.robot_ball_kollision = False
         return reward, game_over
-    if out_of_bounds:
+    if out_of_bounds(robot_x,robot_y,HEIGHT,WIDTH):
+        out_of_bounds = False 
         reward = -5
         return reward, game_over
     _update_ui()
