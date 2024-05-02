@@ -1,5 +1,7 @@
 import pygame
 import math
+import random
+from collections import namedtuple
 import numpy as np
 import graphischedarsetllung as Gr
 from spannung_steuerun import Steuerung
@@ -113,15 +115,34 @@ class fussball_roboter:
         self.ball.left_team_score = 0
         self.ball.right_goal_scored = False
         self.ball.left_goal_scored = False
+        self.direction = Direction.NONE
+        self.frame_iteration = 0
+        self.robot_vx = 0
+        self.robot_vy = 0
+        self.prev_robot_x = 0
+        self.prev_robot_y = 0
+
 
 
     def _move(self, direction): 
 
-        if direction == Direction.RIGHT:
+        if np.array_equal(direction, [1,0,0]):
+            new_dir = Direction.STRAIGHT
+        elif np.array_equal(direction, [0,1,0]):
+            new_dir = Direction.RIGHT
+        elif np.array_equal(direction, [0,0,1]):
+            new_dir = Direction.LEFT
+        else:
+            new_dir = Direction.NONE
+        
+        
+        self.direction = new_dir
+
+        if self.direction == Direction.RIGHT:
             self.current_angle -= 4
-        elif direction == Direction.LEFT:
+        elif self.direction == Direction.LEFT:
             self.current_angle += 4
-        elif direction == Direction.STRAIGHT:
+        elif self.direction == Direction.STRAIGHT:
             self.current_speed += 0.2            
 
         if abs(self.current_speed)>=0.8:
@@ -156,12 +177,13 @@ class fussball_roboter:
         
         self._move(action)
 
-
+        reward = 0
+        game_over = False
         
-        if self.frame_iteration > 1000*(self.ball.right_team_score+self.ball.left_team_score):
+        if self.frame_iteration > 100:
             game_over = True
             reward = -10
-            return reward, game_over
+            return reward, game_over, self.ball.left_team_score
     
         if self.ball.right_goal_scored:    
             reward = 100
@@ -175,9 +197,9 @@ class fussball_roboter:
         
         # 5. update ui and clock
         self._update_ui()
-        self.clock.tick(60)
+        self.clock.tick(40)
         # 6. return game over and score
-        return reward, game_over, self.ball.left_team_score, self.ball.right_team_score 
+        return reward, game_over, self.ball.left_team_score 
     
 
     def _update_ui(self):
@@ -235,7 +257,7 @@ class fussball_roboter:
     
 
         # Regulate the frames per second
-        self.clock.tick(60)
+        self.clock.tick(40)
     
     
     
