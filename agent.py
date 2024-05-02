@@ -19,7 +19,7 @@ possible_actions = [[1, 0, 0], [0, 1, 0], [0, 0, 1],[0, 0 ,0],[0, -1 ,0]]
 
 MAX_MEMORY = 100_000
 BATCH_SIZE = 1000
-LR =0.01
+LR =0.02
 
 # Save the current learning rate to a file
 def save_learning_rate(learning_rate, filename='./model/learning_rate.txt'):
@@ -36,11 +36,11 @@ def load_learning_rate(filename='./model/learning_rate.txt'):
     return learning_rate
 
 class Agent:
-    def __init__(self,file_name='model.pth',learning_rate=0.1,device='cpu') -> None:
+    def __init__(self,file_name='model.pth',n_inputs=10,n_hidden=256,n_outputs=5,learning_rate=0.1,device='cpu') -> None:
         self.n_games = 0
 
         #randomness
-        self.epsilon = 0
+        self.epsilon = 0.4
         self.epsilon_decay = 0.995 
         #learning rate
         self.alpha=learning_rate
@@ -61,11 +61,11 @@ class Agent:
         else:
             print(f"Model file '{file_name}' not found. Training new model...")
             # Train new model
-            self.model = Linear_QNet(11, 256, 3, device)
+            self.model = Linear_QNet(n_inputs, n_hidden, n_outputs, device)
         self.trainer = Q_Trainer(self.model,self.alpha,self.gamma)
 
     def get_state(self, game:fussball_roboter):
-        return np.array(game.vision(),dtype=float)
+        return np.array(game.vision())
     
     def remember(self, state, action, reward, next_state, done):
         self.memory.append((state, action, reward, next_state, done))

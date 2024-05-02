@@ -91,36 +91,35 @@ class fussball_roboter:
         return math.sqrt((x - self.robot_x)**2 + (y - self.robot_y)**2)
         
     def vision(self):
-        ball_position=(self.ball.position[0],self.ball.position[1])
+        ball_position=[self.ball.position[0],self.ball.position[1]]
         ball_distance=self.euclidean_distance(*ball_position)
         goal_position=(self.home_goal_x,self.goal_y+176/2)
         goal_distance=self.euclidean_distance(*goal_position)
        
-        # vision=[
-        #     (self.robot_x,self.robot_y),#Coordinates
-        #     self.current_angle,#Current angle
-        #     self.current_speed,#Speed
-        #     ball_position,#Ball Coordinates
-        #     ball_distance,#distance to ball
-        #     math.copysign(1,self.robot_x-ball_position[0])*
-        #     math.acos((self.robot_x-ball_position[0])/ball_distance),#angle to ball
-        #     goal_distance,#distance to goal
-        #     math.copysign(1,self.robot_x-ball_position[0])*
-        #     math.acos((self.robot_x-goal_position[0])/goal_distance)#angle to ball
-        # ]
+        # vision={
+        #     "position":(self.robot_x,self.robot_y),#Coordinates
+        #     "angle":self.current_angle,#Current angle
+        #     "speed":self.current_speed,#Speed
+        #     "ball position":ball_position,#Ball Coordinates
+        #     "ball distance":ball_distance,#distance to ball
+        #     "ball angle":math.degrees(math.copysign(1,self.robot_y-ball_position[1])*
+        #     math.acos((-self.robot_x+ball_position[0])/ball_distance))%360,#angle to ball
+        #     "goal distance":goal_distance,#distance to goal
+        #     "goal angle":math.degrees(math.asin((self.robot_y-goal_position[1])/goal_distance))%360#angle to goal
+        # }
 
-        vision={
-            "position":(self.robot_x,self.robot_y),#Coordinates
-            "angle":self.current_angle,#Current angle
-            "speed":self.current_speed,#Speed
-            "ball position":ball_position,#Ball Coordinates
-            "ball distance":ball_distance,#distance to ball
-            "ball angle":math.degrees(math.copysign(1,self.robot_y-ball_position[1])*
-            math.acos((-self.robot_x+ball_position[0])/ball_distance))%360,#angle to ball
-            "goal distance":goal_distance,#distance to goal
-            "goal angle":math.degrees(math.asin((self.robot_y-goal_position[1])/goal_distance))%360#angle to goal
-        }
-        return vision    
+
+        vision=[
+            self.robot_x,self.robot_y,#Coordinates
+            self.current_angle,#Current angle
+            self.current_speed,#Speed
+            self.ball.position[0],self.ball.position[1],#Ball Coordinates
+            ball_distance,#distance to ball
+            math.degrees(math.copysign(1,self.robot_y-ball_position[1])*math.acos((-self.robot_x+ball_position[0])/ball_distance))%360,#angle to ball
+            goal_distance,#distance to goal
+            math.degrees(math.asin((self.robot_y-goal_position[1])/goal_distance))%360#angle to goal
+        ]
+        return np.array(vision,dtype=float)    
         
     def robot_coordinates_update(self):
         self.prev_robot_x=self.robot_x
@@ -210,7 +209,7 @@ class fussball_roboter:
         
         # 5. update ui and clock
         self._update_ui()
-        self.clock.tick(60)
+        self.clock.tick(600)
         # 6. return game over and score
         return self.ball.left_team_score, self.ball.right_team_score
     
@@ -265,16 +264,11 @@ class fussball_roboter:
 
 
         pygame.display.flip()  # Updating Displays
-        pygame.time.delay(30)  # Pause to slow down the loop
         
     
 
         # Regulate the frames per second
-        self.clock.tick(60)
-    
-    
-    
-    
+
     # integrate it into the update_ui function
     def goal_score_reset(self):
         if self.ball.right_goal_scored or self.ball.left_goal_scored:
@@ -304,10 +298,7 @@ if __name__ == '__main__':
     # game loop
     while True:
         game.play_step()
-        dict=game.vision()
-        print("goal angle:",int(dict['goal angle']))
-        print("current angle:",dict['angle'])
-        
+        print(len(game.vision()))
         # print("goal angle:",dict['goal angle'])
         
         

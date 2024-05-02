@@ -28,9 +28,9 @@ class Ball:
         self.Mr = 0.6  # Robot Mass
         
 
-        self.e_w= 0.9 # Energy loss coefficient during collision with the wall.
-        self.k_rb = 0.98   # Energy loss coefficient during collision with the robot.
-        self.reibung = 1 * 9.81  # Frictional force. 
+        self.e_w= 0.95 # Energy loss coefficient during collision with the wall.
+        self.k_rb = 1   # Energy loss coefficient during collision with the robot.
+        self.reibung = 10 * 9.81  # Frictional force. 
         self.position = np.array([x, y], dtype=float)  # Initial position.
         self.geschwindigkeit = np.array([vx, vy], dtype=float)  # Initial velocity.
         

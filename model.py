@@ -6,15 +6,18 @@ import os
 
 
 class Linear_QNet(nn.Module):
-    def __init__(self, n_inputs=11,n_hidden=256,n_output=3,device='cpu') -> None:
+    def __init__(self, n_inputs=10,n_hidden=256,n_output=5,device='cpu') -> None:
         super().__init__()
         self.device=device
         self.to(device)
         self.linear1=nn.Linear(n_inputs,n_hidden).to(device)
-        self.linear2=nn.Linear(n_hidden,n_output).to(device)
+        self.linear2=nn.Linear(n_hidden,n_hidden).to(device)
+        
+        self.linear3=nn.Linear(n_hidden,n_output).to(device)
     def forward(self,x):
         x = F.relu(self.linear1(x))
-        x = self.linear2(x)
+        x = F.relu(self.linear2(x))
+        x = self.linear3(x)
         return x
     def save(self, file_name="model.pth"):
         model_folder_path = "./model"

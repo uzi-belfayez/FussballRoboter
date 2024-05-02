@@ -40,7 +40,8 @@ class fussball_roboter:
         self.ball_radius = 25 *  self.pixel_scale
         self.robot_width = 125 * self.pixel_scale
         self.robot_height = 150 *self.pixel_scale
-        self.robot_image = Gr.init_robot_image(self.robot_height, self.robot_width) 
+        self.robot_image = Gr.init_robot_image(self.robot_height, self.robot_width)
+        self.robot_width *=1.1
         self.robot_x = (self.HEIGHT // 2)-50 
         self.robot_y = (self.WIDTH // 2)  
         self.robot_vx = 0
@@ -81,28 +82,27 @@ class fussball_roboter:
     
     def out_of_bounds(self,x,y,w,h):
         return(x<0 or x>w or y<0 or y>h)
+    
     def euclidean_distance(self,x, y):
         return math.sqrt((x - self.robot_x)**2 + (y - self.robot_y)**2)
+    
     def vision(self):
-        ball_position=(self.ball.position[0],self.ball.position[1])
+        ball_position=[self.ball.position[0],self.ball.position[1]]
         ball_distance=self.euclidean_distance(*ball_position)
-        goal_position=(self.home_goal_x,self.goal_y)
+        goal_position=(self.home_goal_x,self.goal_y+176/2)
         goal_distance=self.euclidean_distance(*goal_position)
 
         vision=[
-            (self.robot_x,self.robot_y),#Coordinates
+            self.robot_x,self.robot_y,#Coordinates
             self.current_angle,#Current angle
             self.current_speed,#Speed
-
-            ball_position,#Ball Coordinates
+            self.ball.position[0],self.ball.position[1],#Ball Coordinates
             ball_distance,#distance to ball
-            math.copysign(1,self.robot_x-ball_position[0])*
-            math.acos((self.robot_x-ball_position[0])/ball_distance),#angle to ball
+            math.degrees(math.copysign(1,self.robot_y-ball_position[1])*math.acos((-self.robot_x+ball_position[0])/ball_distance))%360,#angle to ball
             goal_distance,#distance to goal
-            math.copysign(1,self.robot_x-ball_position[0])*
-            math.acos((self.robot_x-goal_position[0])/goal_distance)#angle to goal
+            math.degrees(math.asin((self.robot_y-goal_position[1])/goal_distance))%360#angle to goal
         ]
-        return vision    
+        return vision     
         
 
     def robot_coordinates_update(self):
@@ -174,8 +174,11 @@ class fussball_roboter:
         self.current_angle+= action[0]*4 + action[2]*-4
         self.current_speed+=action[1]*0.2
 
-        if abs(self.current_speed)>=0.8:
-            self.current_speed=math.copysign(0.8,self.current_speed)
+        if self.current_speed>=2:
+            self.current_speed=2
+        if self.current_speed<0:
+            self.current_speed=0
+            
         #print("phi="+str(self.current_angle))
         self.current_angle%=360
 
@@ -208,24 +211,24 @@ class fussball_roboter:
         reward = 0
         game_over = False
         
-        if self.frame_iteration > 100:
+        if self.frame_iteration > 250:
             game_over = True
-            reward = -10
+            reward = -500
             return reward, game_over, self.ball.left_team_score
     
         if self.ball.right_goal_scored:    
-            reward = 100
+            reward = 1000
         elif self.ball.left_goal_scored:
             reward = -100
         elif self.ball.robot_ball_kollision:
             reward = 10
             self.ball.robot_ball_kollision = False
         elif self.out_of_bounds(self.robot_x,self.robot_y,self.HEIGHT,self.WIDTH):
-            reward = -10
+            reward = -50
         
         # 5. update ui and clock
         self._update_ui()
-        self.clock.tick(40)
+        self.clock.tick(600)
         # 6. return game over and score
         return reward, game_over, self.ball.left_team_score 
     
@@ -280,13 +283,10 @@ class fussball_roboter:
 
 
         pygame.display.flip()  # Updating Displays
-        pygame.time.delay(30)  # Pause to slow down the loop
-        
-    
+
 
         # Regulate the frames per second
-        self.clock.tick(40)
-    
+
     
     
     
