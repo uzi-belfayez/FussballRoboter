@@ -93,9 +93,9 @@ class fussball_roboter:
     def vision(self):
         ball_position=(self.ball.position[0],self.ball.position[1])
         ball_distance=self.euclidean_distance(*ball_position)
-        goal_position=(self.home_goal_x,self.goal_y)
+        goal_position=(self.home_goal_x,self.goal_y+176/2)
         goal_distance=self.euclidean_distance(*goal_position)
-
+       
         # vision=[
         #     (self.robot_x,self.robot_y),#Coordinates
         #     self.current_angle,#Current angle
@@ -115,11 +115,10 @@ class fussball_roboter:
             "speed":self.current_speed,#Speed
             "ball position":ball_position,#Ball Coordinates
             "ball distance":ball_distance,#distance to ball
-            "ball angle":math.degrees(math.copysign(1,self.robot_x-ball_position[0])*
-            math.acos((self.robot_x-ball_position[0])/ball_distance)),#angle to ball
+            "ball angle":math.degrees(math.copysign(1,self.robot_y-ball_position[1])*
+            math.acos((-self.robot_x+ball_position[0])/ball_distance))%360,#angle to ball
             "goal distance":goal_distance,#distance to goal
-            "goal angle":math.degrees(math.copysign(1,self.robot_x-ball_position[0])*
-            math.acos((self.robot_x-goal_position[0])/goal_distance))#angle to goal
+            "goal angle":math.degrees(math.asin((self.robot_y-goal_position[1])/goal_distance))%360#angle to goal
         }
         return vision    
         
@@ -165,10 +164,16 @@ class fussball_roboter:
     def _move(self):
           
         self.current_speed+= 0.2*(self.key_state[pygame.K_UP]-self.key_state[pygame.K_DOWN])
+        
         self.current_angle+= 4*(self.key_state[pygame.K_LEFT]-self.key_state[pygame.K_RIGHT])
         
-        if abs(self.current_speed)>=0.8:
-            self.current_speed=math.copysign(0.8,self.current_speed)
+        if self.current_speed>=0.8:
+            self.current_speed=0.8
+        if self.current_speed<0:
+            self.current_speed=0
+            
+        
+            
         #print("phi="+str(self.current_angle))
         self.current_angle%=360
 
@@ -299,7 +304,12 @@ if __name__ == '__main__':
     # game loop
     while True:
         game.play_step()
-        print(game.vision("F"))
+        dict=game.vision()
+        print("goal angle:",int(dict['goal angle']))
+        print("current angle:",dict['angle'])
+        
+        # print("goal angle:",dict['goal angle'])
+        
         
         
     pygame.quit()
