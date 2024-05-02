@@ -115,7 +115,8 @@ class fussball_roboter:
         self.ball.left_goal_scored = False
 
 
-    def _move(self, direction):
+    def _move(self, direction): 
+
         if direction == Direction.RIGHT:
             self.current_angle -= 4
         elif direction == Direction.LEFT:
@@ -260,15 +261,4 @@ class fussball_roboter:
         self.ball_speed_px_s = np.sqrt(self.ball.geschwindigkeit[0]**2 + self.ball.geschwindigkeit[1]**2)
         self.ball_speed_m_s = self.pixelgeschwindigkeit_umrechnen(self.ball_speed_px_s)
 
-
-
-if __name__ == '__main__':
-    game = fussball_roboter()
-    
-    # game loop
-    while True:
-        game.play_step()
-        
-        
-    pygame.quit()
         
