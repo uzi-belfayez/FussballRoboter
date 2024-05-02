@@ -20,6 +20,9 @@ class Direction(Enum):
     LEFT = 3
     NONE = 4
 
+
+
+
 class fussball_roboter:
     def __init__(self) -> None:
 
@@ -32,7 +35,14 @@ class fussball_roboter:
 
         self.direction = Direction.NONE
 
-
+        self.key_state =   {pygame.K_UP:    0,
+                            pygame.K_DOWN:  0,
+                            pygame.K_RIGHT: 0,
+                            pygame.K_LEFT:  0}
+        self.keys = {pygame.K_UP:"K_UP",
+                pygame.K_DOWN:"K_DOWN",
+                pygame.K_RIGHT:"K_RIGHT",
+                pygame.K_LEFT:"K_LEFT"}
         # Defining visual parameters for the ball and robot 
         self.ball_radius = 25 *  self.pixel_scale
         self.robot_width = 125 * self.pixel_scale
@@ -47,7 +57,12 @@ class fussball_roboter:
         self.V_max = 9  # Maximum voltage in volts
         self.t_final=10 # Simulation duration (in seconds)
         self.dt = 0.05 # Time step for the simulation
-
+                #goal parameters
+        self.home_goal_x=910
+        self.away_goal_x=0
+        self.goal_y=217
+        self.height=175
+        self.width=5
         # Initializing the ball 
         self.ball = Ball(self.HEIGHT // 2, self.WIDTH // 2, 0, 0,self.HEIGHT // 2, self.WIDTH // 2)
 
@@ -72,9 +87,42 @@ class fussball_roboter:
     
     def out_of_bounds(self,x,y,w,h):
         return(x<0 or x>w or y<0 or y>h)
-    
+    def euclidean_distance(self,x, y):
+        return math.sqrt((x - self.robot_x)**2 + (y - self.robot_y)**2)
         
+    def vision(self):
+        ball_position=(self.ball.position[0],self.ball.position[1])
+        ball_distance=self.euclidean_distance(*ball_position)
+        goal_position=(self.home_goal_x,self.goal_y)
+        goal_distance=self.euclidean_distance(*goal_position)
 
+        # vision=[
+        #     (self.robot_x,self.robot_y),#Coordinates
+        #     self.current_angle,#Current angle
+        #     self.current_speed,#Speed
+        #     ball_position,#Ball Coordinates
+        #     ball_distance,#distance to ball
+        #     math.copysign(1,self.robot_x-ball_position[0])*
+        #     math.acos((self.robot_x-ball_position[0])/ball_distance),#angle to ball
+        #     goal_distance,#distance to goal
+        #     math.copysign(1,self.robot_x-ball_position[0])*
+        #     math.acos((self.robot_x-goal_position[0])/goal_distance)#angle to ball
+        # ]
+
+        vision={
+            "position":(self.robot_x,self.robot_y),#Coordinates
+            "angle":self.current_angle,#Current angle
+            "speed":self.current_speed,#Speed
+            "ball position":ball_position,#Ball Coordinates
+            "ball distance":ball_distance,#distance to ball
+            "ball angle":math.degrees(math.copysign(1,self.robot_x-ball_position[0])*
+            math.acos((self.robot_x-ball_position[0])/ball_distance)),#angle to ball
+            "goal distance":goal_distance,#distance to goal
+            "goal angle":math.degrees(math.copysign(1,self.robot_x-ball_position[0])*
+            math.acos((self.robot_x-goal_position[0])/goal_distance))#angle to goal
+        }
+        return vision    
+        
     def robot_coordinates_update(self):
         self.prev_robot_x=self.robot_x
         self.prev_robot_y=self.robot_y
@@ -114,14 +162,11 @@ class fussball_roboter:
         self.ball.left_goal_scored = False
 
 
-    def _move(self, direction):
-        if direction == Direction.RIGHT:
-            self.current_angle -= 4
-        elif direction == Direction.LEFT:
-            self.current_angle += 4
-        elif direction == Direction.STRAIGHT:
-            self.current_speed += 0.2            
-
+    def _move(self):
+          
+        self.current_speed+= 0.2*(self.key_state[pygame.K_UP]-self.key_state[pygame.K_DOWN])
+        self.current_angle+= 4*(self.key_state[pygame.K_LEFT]-self.key_state[pygame.K_RIGHT])
+        
         if abs(self.current_speed)>=0.8:
             self.current_speed=math.copysign(0.8,self.current_speed)
         #print("phi="+str(self.current_angle))
@@ -130,8 +175,8 @@ class fussball_roboter:
         self.robot_coordinates_update()
         #self.robot_wall_collision()
 
-        self.ball.score_goal(910,0,217,175,5,self.ball_radius)
-
+        self.ball.score_goal(self.home_goal_x, self.away_goal_x, self.goal_y, self.height, self.width,self.ball_radius)
+        
         if self.ball.right_goal_scored or self.ball.left_goal_scored:
             self.robot_x, self.robot_y = (self.HEIGHT // 2)-50, (self.WIDTH // 2)
             self.current_angle = 0
@@ -150,17 +195,13 @@ class fussball_roboter:
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
-
-            if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_LEFT:
-                        self.direction = Direction.LEFT
-                    elif event.key == pygame.K_RIGHT:
-                        self.direction = Direction.RIGHT
-                    elif event.key == pygame.K_UP:
-                        self.direction = Direction.STRAIGHT
+            elif event.type == pygame.KEYDOWN:
+                self.key_state[event.key] = 1  # Set the key to pressed
+            elif event.type == pygame.KEYUP:
+                self.key_state[event.key] = 0  # Set the key to released
         #to be continued
         
-        self._move(self.direction)
+        self._move()
         
         # 5. update ui and clock
         self._update_ui()
@@ -258,6 +299,7 @@ if __name__ == '__main__':
     # game loop
     while True:
         game.play_step()
+        print(game.vision("F"))
         
         
     pygame.quit()

@@ -1,9 +1,6 @@
-a=5
+(x,y)=(500,600)
 
-def fn(a):
-    a=9
+def test(x, y):
+    print(x,y)
 
-
-
-a=fn(a)
-print(a)
+test(*(x,y))

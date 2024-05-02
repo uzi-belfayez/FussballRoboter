@@ -1,5 +1,7 @@
 import pygame
+import os
 
+current_dir = os.path.dirname(__file__)
 # Constants for screen size and scaling factor.
 SCALE_FACTOR = 0.5# 100 pixels correspond to 200 millimeters.
 WIDTH = int(1220 * SCALE_FACTOR)  # Conversion of real dimensions into pixels.
@@ -66,7 +68,7 @@ def draw_ball(screen, ball, ball_radius, color):
 
 def init_robot_image(robot_height, robot_width):
     # Function to initialize the robot image and scale it to the desired size
-    robot_image = pygame.image.load("robot.png")
+    robot_image = pygame.image.load(os.path.join(current_dir,"robot.png"))
     return pygame.transform.scale(robot_image, (robot_height, robot_width))  
 
 def update_robot(screen, robot_image, robot_x, robot_y, winkel):
