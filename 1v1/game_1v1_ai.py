@@ -43,7 +43,7 @@ class fussball_roboter:
         self.robot_width = 125 * self.pixel_scale
         self.robot_height = 150 *self.pixel_scale
         self.robot_image = Gr.init_robot_image(self.robot_height, self.robot_width) 
-        self.robot_x = (self.HEIGHT // 2)-50 
+        self.robot_x = (self.HEIGHT // 2)-100 
         self.robot_y = (self.WIDTH // 2)  
         self.robot_vx = 0
         self.robot_vy = 0
@@ -54,12 +54,14 @@ class fussball_roboter:
         self.dt = 0.05 # Time step for the simulation
 
         self.robot_image1 = Gr.init_robot1_image(self.robot_height, self.robot_width) 
-        self.robot_x1 = (self.HEIGHT // 2)+50 
+        self.robot_x1 = (self.HEIGHT // 2)+100 
         self.robot_y1 = (self.WIDTH // 2)  
         self.robot_vx1 = 0
         self.robot_vy1 = 0
         self.prev_robot_x1 = 0
         self.prev_robot_y1 = 0
+
+        self.robot_radius = math.sqrt((self.robot_width / 2) ** 2 + (self.robot_height / 2) ** 2)  # Half-diagonal as radius
 
 
         # Initializing the ball 
@@ -72,7 +74,7 @@ class fussball_roboter:
         self.current_angle1 = 0
         self.current_speed1 = 0
 
-        self.robot_robot_collision = False
+        self.r_r_collision_b = False
 
         
 
@@ -92,7 +94,16 @@ class fussball_roboter:
     def out_of_bounds(self,x,y,w,h):
         return(x<0 or x>w or y<0 or y>h)
     
-        
+
+    def distance_to(self):
+        dx = self.robot_x - self.robot_x1
+        dy = self.robot_y - self.robot_y1
+        return math.sqrt(dx ** 2 + dy ** 2)
+
+    def robot_robot_collision_f(self):
+        distance = self.distance_to()
+        return (distance < 2*(self.robot_radius))
+
 
     def robot_coordinates_update(self):
         self.prev_robot_x=self.robot_x
@@ -147,18 +158,18 @@ class fussball_roboter:
                 self.robot_x1=self.prev_robot_x1
                 self.robot_y1=self.prev_robot_y1
 
+        self.r_r_collision_b = self.robot_robot_collision_f()
+        if self.r_r_collision_b:
+            self.robot_x=self.prev_robot_x
+            self.robot_y=self.prev_robot_y
+            self.robot_x1=self.prev_robot_x1
+            self.robot_y1=self.prev_robot_y1
+
         
-        for (x,y) in self.point_list:
-            if (x,y) in self.point_list1:
-                self.robot_x=self.prev_robot_x
-                self.robot_y=self.prev_robot_y
-                self.robot_x1=self.prev_robot_x1
-                self.robot_y1=self.prev_robot_y1
-                self.robot_robot_collision = True
     
     
     def reset(self):
-        self.robot_x, self.robot_y = (self.HEIGHT // 2)-50, (self.WIDTH // 2)
+        self.robot_x, self.robot_y = (self.HEIGHT // 2)-100, (self.WIDTH // 2)
         self.current_angle = 0
         self.current_speed = 0
         self.ball = Ball(self.HEIGHT // 2, self.WIDTH // 2, 0, 0,self.HEIGHT // 2, self.WIDTH // 2)
@@ -176,7 +187,7 @@ class fussball_roboter:
         self.prev_robot_y = 0
 
 
-        self.robot_x1, self.robot_y1 = (self.HEIGHT // 2)+50, (self.WIDTH // 2)
+        self.robot_x1, self.robot_y1 = (self.HEIGHT // 2)+100, (self.WIDTH // 2)
         self.current_angle1 = 0
         self.current_speed1 = 0
         self.direction1 = Direction.NONE
@@ -220,9 +231,9 @@ class fussball_roboter:
         self.ball.score_goal(910,0,217,175,5,self.ball_radius)
 
         if self.ball.right_goal_scored or self.ball.left_goal_scored:
-            self.robot_x, self.robot_y = (self.HEIGHT // 2)-50, (self.WIDTH // 2)
+            self.robot_x, self.robot_y = (self.HEIGHT // 2)-100, (self.WIDTH // 2)
             self.current_angle = 0
-            self.robot_x1, self.robot_y1 = (self.HEIGHT // 2)+50, (self.WIDTH // 2)
+            self.robot_x1, self.robot_y1 = (self.HEIGHT // 2)+100, (self.WIDTH // 2)
             self.current_angle1 = 0
             self.ball.right_goal_scored = False
             self.ball.left_goal_scored = False
@@ -249,8 +260,8 @@ class fussball_roboter:
         elif self.direction1 == Direction.STRAIGHT:
             self.current_speed1 += 0.2
 
-        if abs(self.current_speed)>=0.8:
-            self.current_speed=math.copysign(0.8,self.current_speed)
+        if abs(self.current_speed1)>=0.8:
+            self.current_speed1 = math.copysign(0.8,self.current_speed1)
         #print("phi="+str(self.current_angle))
         self.current_angle%=360
 
@@ -300,10 +311,9 @@ class fussball_roboter:
             reward = 10
             self.ball.robot_ball_kollision = False
         elif self.out_of_bounds(self.robot_x,self.robot_y,self.HEIGHT,self.WIDTH):
-            reward = -30
-        elif self.robot_robot_collision:
-            reward = -30
-            self.robot_robot_collision = False
+            reward = -10
+        elif self.r_r_collision_b:
+            reward = -10
         
         # 5. update ui and clock
         self._update_ui()
@@ -341,10 +351,9 @@ class fussball_roboter:
             reward = 10
             self.ball.robot_ball_kollision = False
         elif self.out_of_bounds(self.robot_x1,self.robot_y1,self.HEIGHT,self.WIDTH):
-            reward = -30
-        elif self.robot_robot_collision:
-            reward1 = -30
-            self.robot_robot_collision = False
+            reward = -10
+        elif self.r_r_collision_b:
+            reward1 = -10
         
         # 5. update ui and clock
         self._update_ui()

@@ -17,9 +17,9 @@ class Agent:
         self.epsilon = 0
         self.gamma = 0.9
         self.memory = deque(maxlen=MAX_MEMORY)
-        self.model = Linear_QNet(9, 256, 3)
+        self.model = Linear_QNet(11, 256, 3)
         self.trainer = QTrainer(self.model, lr=LR, gamma=self.gamma)
-        self.model1 = Linear_QNet(9, 256, 3)
+        self.model1 = Linear_QNet(11, 256, 3)
         self.trainer1 = QTrainer(self.model1, lr=LR, gamma=self.gamma)
 
     def get_state(self, fussball_roboter):
@@ -41,7 +41,9 @@ class Agent:
         fussball_roboter.ball.position[1] > fussball_roboter.robot_y, # ball is on the right
         fussball_roboter.ball.position[1] < fussball_roboter.robot_y, # ball is on the left
         fussball_roboter.ball.position[0] > fussball_roboter.robot_x, # ball is in front of the robot
-        fussball_roboter.ball.position[0] < fussball_roboter.robot_x # ball is behind the robot
+        fussball_roboter.ball.position[0] < fussball_roboter.robot_x, # ball is behind the robot
+        fussball_roboter.robot_x1,
+        fussball_roboter.robot_y1
 
         ]
         return np.array(state, dtype=int)
@@ -65,7 +67,9 @@ class Agent:
         fussball_roboter.ball.position[1] > fussball_roboter.robot_y1, # ball is on the right
         fussball_roboter.ball.position[1] < fussball_roboter.robot_y1, # ball is on the left
         fussball_roboter.ball.position[0] > fussball_roboter.robot_x1, # ball is in front of the robot
-        fussball_roboter.ball.position[0] < fussball_roboter.robot_x1 # ball is behind the robot
+        fussball_roboter.ball.position[0] < fussball_roboter.robot_x1, # ball is behind the robot
+        fussball_roboter.robot_x,
+        fussball_roboter.robot_y
 
         ]
         return np.array(state1, dtype=int)
@@ -165,7 +169,7 @@ def train():
                 agent.model.save()
             if score1 > record1 :
                 record1 = score1
-                agent.model1.save()
+                agent.model1.save1()
 
             print('Game', agent.n_games, 'Score', score,'-',score1, 'Record:', record,'Record1:', record1)
 
