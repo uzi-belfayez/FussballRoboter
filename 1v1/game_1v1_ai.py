@@ -5,9 +5,9 @@ from collections import namedtuple
 import numpy as np
 import graphischedarsetllung as Gr
 from spannung_steuerun import Steuerung
-from ball_Modell import Ball
 import matplotlib.pyplot as plt
 from enum import Enum
+from ball_Modell_enhanced import Ball
 
 # --- Pygame Initialization and configuration ---
 pygame.init()
@@ -95,7 +95,7 @@ class fussball_roboter:
         return geschwindigkeit_m_s
     
     def out_of_bounds(self,x,y,w,h):
-        return(x<0 or x>w or y<0 or y>h)
+        return(x<=0 or x>=w or y<=0 or y>=h)
     
 
     def distance_to(self):
@@ -161,10 +161,10 @@ class fussball_roboter:
                     (self.x2- self.robot_width//2*np.sin(np.radians(self.current_angle)),self.y2- self.robot_width//2*np.cos(np.radians(self.current_angle)))]
 
         for (x,y) in self.point_list:
-            if self.out_of_bounds(x,y,self.HEIGHT,self.WIDTH):
+            self.r_out_of_bonds = self.out_of_bounds(x,y,self.HEIGHT,self.WIDTH)
+            if self.r_out_of_bonds:
                 self.robot_x=self.prev_robot_x
                 self.robot_y=self.prev_robot_y
-                self.r_out_of_bonds = True
 
 
 
@@ -183,10 +183,11 @@ class fussball_roboter:
                     (self.x21- self.robot_width//2*np.sin(np.radians(self.current_angle1)),self.y21- self.robot_width//2*np.cos(np.radians(self.current_angle1)))]
 
         for (x,y) in self.point_list1:
-            if self.out_of_bounds(x,y,self.HEIGHT,self.WIDTH):
+            self.r1_out_of_bonds = self.out_of_bounds(x,y,self.HEIGHT,self.WIDTH)
+            if self.r1_out_of_bonds:
                 self.robot_x1=self.prev_robot_x1
                 self.robot_y1=self.prev_robot_y1
-                self.r1_out_of_bonds = True
+                
 
         self.r_r_collision_b = self.robot_robot_collision_f()
         if self.r_r_collision_b:
@@ -195,7 +196,6 @@ class fussball_roboter:
             self.robot_x1=self.prev_robot_x1
             self.robot_y1=self.prev_robot_y1
 
-        
     
     
     def reset(self):
@@ -352,7 +352,6 @@ class fussball_roboter:
             reward = -500
         elif self.ball.robot_ball_kollision:
             reward = 100
-            self.ball.robot_ball_kollision = False
         elif self.r_out_of_bonds:
             reward = -10
         elif self.r_r_collision_b:
@@ -391,9 +390,8 @@ class fussball_roboter:
             reward1 = -500
         elif self.ball.left_goal_scored:
             reward1 = 1000
-        elif self.ball.robot_ball_kollision:
+        elif self.ball.robot1_ball_kollision:
             reward1 = 100
-            self.ball.robot_ball_kollision = False
         elif self.r1_out_of_bonds:
             reward1 = -10
         elif self.r_r_collision_b:
@@ -430,9 +428,9 @@ class fussball_roboter:
         self.robot_vy = -self.geschwindigkeit_umrechnen(self.current_speed) *self.dt * np.sin(np.radians(self.current_angle))
         self.ball.kollision_detektion(self.dt, self.ball_radius, self.robot_x, self.robot_y, self.robot_width, self.robot_height, self.current_angle, 10*self.robot_vx, 10*self.robot_vy)
     
-        self.robot_vx1 = self.geschwindigkeit_umrechnen(self.current_speed1) * self.dt * np.cos(np.radians(self.current_angle1))
-        self.robot_vy1 = -self.geschwindigkeit_umrechnen(self.current_speed1) *self.dt * np.sin(np.radians(self.current_angle1))
-        self.ball.kollision_detektion(self.dt, self.ball_radius, self.robot_x1, self.robot_y1, self.robot_width, self.robot_height, self.current_angle1, 10*self.robot_vx1, 10*self.robot_vy1)
+        self.robot_vx1 = -self.geschwindigkeit_umrechnen(self.current_speed1) * self.dt * np.cos(np.radians(self.current_angle1))
+        self.robot_vy1 = self.geschwindigkeit_umrechnen(self.current_speed1) *self.dt * np.sin(np.radians(self.current_angle1))
+        self.ball.kollision_detektion_1(self.dt, self.ball_radius, self.robot_x1, self.robot_y1, self.robot_width, self.robot_height, self.current_angle1, 10*self.robot_vx1, 10*self.robot_vy1)
 
 
 

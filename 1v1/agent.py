@@ -5,7 +5,7 @@ from game_1v1_ai import fussball_roboter, Direction
 from collections import deque
 from model import Linear_QNet, QTrainer
 from helper import plot
-from ball_Modell import Ball
+from ball_Modell_enhanced import Ball
 
 MAX_MEMORY = 200_000
 BATCH_SIZE = 2000

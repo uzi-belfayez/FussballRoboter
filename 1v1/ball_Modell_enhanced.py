@@ -23,6 +23,7 @@ class Ball:
         self.right_goal_scored = False
 
         self.robot_ball_kollision = False
+        self.robot1_ball_kollision = False
         
         self.Mb = 0.0012  # Ball Mass
         self.Mr = 0.6  # Robot Mass
@@ -175,6 +176,111 @@ class Ball:
 
             self.position[0] = x3_ball
             self.position[1] = y3_ball    
+
+    def kollision_detektion_1(self, dt , ball_radius, robot_x, robot_y, robot_width, robot_height, winkel, robot_vx, robot_vy):
+        # Conversion of ball coordinates into the robot's coordinate system
+        x1_ball = self.position[0] - robot_x
+        y1_ball = self.position[1] - robot_y
+        x2_ball = x1_ball * math.cos(math.radians(winkel))  - y1_ball * np.sin(math.radians(winkel))
+        y2_ball = x1_ball * math.sin(math.radians(winkel)) + y1_ball * np.cos(math.radians(winkel))
+        
+        # Conversion of the velocity coordinates of the ball into the robot's coordinate system.
+        vx_ball = self.geschwindigkeit[0] 
+        vy_ball = self.geschwindigkeit[1] 
+        vx1_ball = vx_ball * math.cos(math.radians(winkel)) - vy_ball * np.sin(math.radians(winkel))
+        vy1_ball = vx_ball * math.sin(math.radians(winkel)) + vy_ball * np.cos(math.radians(winkel))
+        
+        # Conversion of the velocity coordinates of the robot into the robot's coordinate system.
+        robot_vx1 = robot_vx * math.cos(math.radians(winkel)) - robot_vy * np.sin(math.radians(winkel))
+        robot_vy1 = robot_vx * math.sin(math.radians(winkel)) + robot_vy * np.cos(math.radians(winkel))
+        
+        # Checking for collision between the ball and the robot.
+        self.robot1_ball_kollision = False
+        if (-robot_height/2 <= x2_ball + ball_radius) and (robot_height/2 >= x2_ball - ball_radius) and (-robot_width/2 <= y2_ball) and (robot_width/2 >= y2_ball):
+            self.robot1_ball_kollision = True
+        elif (-robot_height/2 <= x2_ball) and (robot_height/2 >= x2_ball) and (-robot_width/2 <= y2_ball + ball_radius) and (robot_width/2 >= y2_ball - ball_radius):
+            self.robot1_ball_kollision = True 
+        elif np.sqrt((robot_height/2 - x2_ball)**2 +  (robot_width/2- y2_ball)**2) <= ball_radius or \
+             np.sqrt((-robot_height/2 - x2_ball)**2 +  (robot_width/2- y2_ball)**2) <= ball_radius or \
+             np.sqrt((robot_height/2 - x2_ball)**2 +  (-robot_width/2- y2_ball)**2) <= ball_radius or \
+             np.sqrt((-robot_height/2 - x2_ball)**2 +  (-robot_width/2- y2_ball)**2) <= ball_radius :       
+             self.robot1_ball_kollision = True
+                          
+        # Handling the collision of the ball with the left side of the robot.
+        if self.robot1_ball_kollision:
+            if -robot_height/2 >= x2_ball and -robot_width/2 <= y2_ball and robot_width/2 >= y2_ball:
+                vx1_ball = (vx1_ball * self.Mb + robot_vx1 * self.Mr) / (self.Mb + self.Mr) - ( (vx1_ball-robot_vx1 )*self.k_rb * self.Mr ) / (self.Mb + self.Mr)
+                robot_vx1 =(vx1_ball * self.Mb + robot_vx1 * self.Mr) / (self.Mb + self.Mr) -  ( (robot_vx1- vx1_ball)*self.k_rb * self.Mb ) / (self.Mb + self.Mr)
+                
+                x2_ball = -robot_height/2 - ball_radius
+
+            # Handling the collision of the ball with the right side of the robot.
+            if robot_height/2 <= x2_ball and -robot_width/2 <= y2_ball and robot_width/2 >= y2_ball:
+
+                vx1_ball = (vx1_ball * self.Mb + robot_vx1 * self.Mr) / (self.Mb + self.Mr) - ( (vx1_ball-robot_vx1 )*self.k_rb * self.Mr ) / (self.Mb + self.Mr)
+                robot_vx1 =(vx1_ball * self.Mb + robot_vx1 * self.Mr) / (self.Mb + self.Mr) -  ( (robot_vx1- vx1_ball)*self.k_rb * self.Mb ) / (self.Mb + self.Mr)
+               
+                x2_ball = robot_height/2 +  ball_radius
+
+            # Handling the collision of the ball with the top side of the robot.
+            if -robot_width/2 >= y2_ball and -robot_height/2 <= x2_ball and robot_height/2 >= x2_ball:
+
+                vy1_ball = (vy1_ball * self.Mb + robot_vy1 * self.Mr) / (self.Mb + self.Mr) - ( (vy1_ball-robot_vx1 )*self.k_rb * self.Mr ) / (self.Mb + self.Mr)
+                robot_vy1 = (vy1_ball * self.Mb + robot_vy1 * self.Mr) / (self.Mb + self.Mr) -  ( (robot_vy1- vy1_ball)*self.k_rb * self.Mb ) / (self.Mb + self.Mr)
+                
+                y2_ball = -robot_width/2 - ball_radius
+
+            # Handling the collision of the ball with the bottom side of the robot.
+            if robot_width/2 <= y2_ball and -robot_height/2 <= x2_ball and robot_height/2 >= x2_ball:
+                
+                vy1_ball =   (vy1_ball * self.Mb+ robot_vy1 * self.Mr) / (self.Mb + self.Mr) - ( (vy1_ball-robot_vx1 )*self.k_rb * self.Mr ) / (self.Mb + self.Mr)
+                robot_vy1 = (vy1_ball * self.Mb + robot_vy1 * self.Mr) / (self.Mb + self.Mr) -  ( (robot_vy1- vy1_ball)*self.k_rb * self.Mb ) / (self.Mb + self.Mr)
+              
+                y2_ball = robot_width/2 + ball_radius
+
+               # Collision between the ball and the upper left corner of the robot.
+            if -robot_height/2 >= x2_ball and -robot_width/2 >= y2_ball:
+                if abs(-robot_width/2-y2_ball) >= abs(-robot_height/2-x2_ball):
+                    vy1_ball = -vy1_ball*self.k_rb
+                else:
+                    vx1_ball= -vx1_ball*self.k_rb
+           
+            # Collision between the ball and the upper right corner of the robot.
+            if robot_height/2 <= x2_ball and -robot_width/2 >= y2_ball :
+                if abs(-robot_width/2-y2_ball) > abs(robot_height/2-x2_ball):
+                    vy1_ball = -vy1_ball*self.k_rb
+                else:
+                    vx1_ball= -vx1_ball*self.k_rb
+                
+            # Collision between the ball and the lower left corner of the robot.
+            if -robot_height/2 >= x2_ball and robot_width/2 <= y2_ball :
+                # Bestimmung nach Eckkollision
+                if abs(robot_width/2-y2_ball) >= abs(-robot_height/2-x2_ball):
+                    vy1_ball = -vy1_ball*self.k_rb
+                else:
+                    vx1_ball= -vx1_ball*self.k_rb
+               
+            # Collision between the ball and the lower right corner of the robot.        
+            if robot_height/2 <= x2_ball and robot_width/2 <= y2_ball :
+                # Bestimmung nach Eckkollision
+                if abs(robot_width/2-y2_ball) >= abs(robot_height/2-x2_ball):
+                    vy1_ball = -vy1_ball*self.k_rb
+                else:
+                    vx1_ball= -vx1_ball*self.k_rb
+
+            # Conversion of the ball coordinates from the robot's coordinate system back into the world coordinate system.
+            winkel = - winkel   
+            vx2_ball = vx1_ball * math.cos(math.radians(winkel)) - vy1_ball * np.sin(math.radians(winkel))
+            vy2_ball = vx1_ball * math.sin(math.radians(winkel)) + vy1_ball * np.cos(math.radians(winkel))
+
+            self.geschwindigkeit[0] = vx2_ball
+            self.geschwindigkeit[1] = vy2_ball
+            
+            x3_ball = x2_ball * math.cos(math.radians(winkel)) - y2_ball * np.sin(math.radians(winkel)) + robot_x
+            y3_ball = x2_ball * math.sin(math.radians(winkel)) + y2_ball * np.cos(math.radians(winkel)) + robot_y
+
+            self.position[0] = x3_ball
+            self.position[1] = y3_ball 
 
     def score_goal(self, right_goal_x, left_goal_x, goal_y, height, width, ball_radius):
 
