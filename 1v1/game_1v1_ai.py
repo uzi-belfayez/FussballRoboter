@@ -64,6 +64,8 @@ class fussball_roboter:
 
         self.robot_radius = math.sqrt((self.robot_width / 2) ** 2 + (self.robot_height / 2) ** 2)-8  # Half-diagonal as radius
 
+        self.r_out_of_bonds = False
+        self.r1_out_of_bonds = False
 
         # Initializing the ball 
         self.ball = Ball(self.HEIGHT // 2, self.WIDTH // 2, 0, 0,self.HEIGHT // 2, self.WIDTH // 2)
@@ -162,6 +164,8 @@ class fussball_roboter:
             if self.out_of_bounds(x,y,self.HEIGHT,self.WIDTH):
                 self.robot_x=self.prev_robot_x
                 self.robot_y=self.prev_robot_y
+                self.r_out_of_bonds = True
+
 
 
         
@@ -182,6 +186,7 @@ class fussball_roboter:
             if self.out_of_bounds(x,y,self.HEIGHT,self.WIDTH):
                 self.robot_x1=self.prev_robot_x1
                 self.robot_y1=self.prev_robot_y1
+                self.r1_out_of_bonds = True
 
         self.r_r_collision_b = self.robot_robot_collision_f()
         if self.r_r_collision_b:
@@ -348,7 +353,7 @@ class fussball_roboter:
         elif self.ball.robot_ball_kollision:
             reward = 100
             self.ball.robot_ball_kollision = False
-        elif self.out_of_bounds(self.robot_x,self.robot_y,self.HEIGHT,self.WIDTH):
+        elif self.r_out_of_bonds:
             reward = -10
         elif self.r_r_collision_b:
             reward = -10
@@ -389,7 +394,7 @@ class fussball_roboter:
         elif self.ball.robot_ball_kollision:
             reward1 = 100
             self.ball.robot_ball_kollision = False
-        elif self.out_of_bounds(self.robot_x1,self.robot_y1,self.HEIGHT,self.WIDTH):
+        elif self.r1_out_of_bonds:
             reward1 = -10
         elif self.r_r_collision_b:
             reward1 = -10
