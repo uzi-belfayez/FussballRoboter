@@ -7,19 +7,19 @@ from model import Linear_QNet, QTrainer
 from helper import plot
 from ball_Modell import Ball
 
-MAX_MEMORY = 100_000
-BATCH_SIZE = 1000
+MAX_MEMORY = 200_000
+BATCH_SIZE = 2000
 LR = 0.001
 
 class Agent:
     def __init__(self):
         self.n_games = 0
         self.epsilon = 0
-        self.gamma = 0.9
+        self.gamma = 0.95
         self.memory = deque(maxlen=MAX_MEMORY)
-        self.model = Linear_QNet(11, 256, 3)
+        self.model = Linear_QNet(13, 256, 4)
         self.trainer = QTrainer(self.model, lr=LR, gamma=self.gamma)
-        self.model1 = Linear_QNet(11, 256, 3)
+        self.model1 = Linear_QNet(13, 256, 4)
         self.trainer1 = QTrainer(self.model1, lr=LR, gamma=self.gamma)
 
     def get_state(self, fussball_roboter):
@@ -43,7 +43,9 @@ class Agent:
         fussball_roboter.ball.position[0] > fussball_roboter.robot_x, # ball is in front of the robot
         fussball_roboter.ball.position[0] < fussball_roboter.robot_x, # ball is behind the robot
         fussball_roboter.robot_x1,
-        fussball_roboter.robot_y1
+        fussball_roboter.robot_y1,
+        fussball_roboter.current_speed,
+        fussball_roboter.current_angle
 
         ]
         return np.array(state, dtype=int)
@@ -69,7 +71,9 @@ class Agent:
         fussball_roboter.ball.position[0] > fussball_roboter.robot_x1, # ball is in front of the robot
         fussball_roboter.ball.position[0] < fussball_roboter.robot_x1, # ball is behind the robot
         fussball_roboter.robot_x,
-        fussball_roboter.robot_y
+        fussball_roboter.robot_y,
+        fussball_roboter.current_speed1,
+        fussball_roboter.current_angle1
 
         ]
         return np.array(state1, dtype=int)
@@ -107,7 +111,7 @@ class Agent:
     def get_action(self, state):
         #random moves: tradeoff exploration / exploitation
         self.epsilon = 80 - self.n_games
-        final_move = [0,0,0]
+        final_move = [0,0,0,0]
         if random.randint(0, 200) < self.epsilon:
             move = random.randint(0, 2)
             final_move[move] = 1
@@ -177,13 +181,14 @@ def train():
             total_score += score
             mean_score = total_score / agent.n_games
             plot_mean_scores.append(mean_score)
-            plot(plot_scores, plot_mean_scores)
+            
 
             plot_scores1.append(score1)
             total_score1 += score1
             mean_score1 = total_score1 / agent.n_games
             plot_mean_scores1.append(mean_score1)
-            plot(plot_scores1, plot_mean_scores1)
+            
+            plot(plot_scores, plot_mean_scores, plot_scores1, plot_mean_scores1)
 
 
 if __name__ == '__main__':

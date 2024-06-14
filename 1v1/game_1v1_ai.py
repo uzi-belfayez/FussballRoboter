@@ -20,7 +20,8 @@ class Direction(Enum):
     STRAIGHT = 1
     RIGHT = 2
     LEFT = 3
-    NONE = 4
+    BACKWARD = 4
+    NONE = 5
 
 class fussball_roboter:
     def __init__(self) -> None:
@@ -61,7 +62,7 @@ class fussball_roboter:
         self.prev_robot_x1 = 0
         self.prev_robot_y1 = 0
 
-        self.robot_radius = math.sqrt((self.robot_width / 2) ** 2 + (self.robot_height / 2) ** 2)  # Half-diagonal as radius
+        self.robot_radius = math.sqrt((self.robot_width / 2) ** 2 + (self.robot_height / 2) ** 2)-8  # Half-diagonal as radius
 
 
         # Initializing the ball 
@@ -103,6 +104,30 @@ class fussball_roboter:
     def robot_robot_collision_f(self):
         distance = self.distance_to()
         return (distance < 2*(self.robot_radius))
+    
+    def spawn_entity(self):
+        # Left robot positions
+        robot_x = [197.433561685156, 114.50542004373557, 106.26829947961285, 207.46786893991998, 121.84669180482004, 
+                   195.15349950427876, 76.8131642767075, 136.93447100405686, 199.14053777685734, 93.76801168749]
+        robot_y = [372.7965973803257, 444.4985478735946, 198.1614905295145, 162.729379352683, 479.7406779838022, 
+                   265.91670534600865, 258.20067722916383, 359.52487474059865, 120.24477135770407, 224.40276197556946]
+
+        # Right robot positions
+        robot_x1 = [653.4902439732658, 724.0101725437587, 763.4777597656727, 635.8219501068628, 654.6189542387269, 
+                    637.7414818676896, 741.9264202339807, 739.2365338557854, 651.4536981570342, 721.2061647661053]
+        robot_y1 = [291.6769539773344, 93.19848150024967, 93.76769374160202, 302.49168246892214, 198.06840948412068, 
+                    466.2633730131679, 447.5626602668288, 150.51014338090857, 341.9703642014129, 240.82198469844127]
+
+
+        # Randomly select a position for the left robot
+        index = random.randint(0, 9)
+        self.robot_x = robot_x[index]
+        self.robot_y = robot_y[index]
+        # Randomly select a position for the right robot
+        index1 = random.randint(0, 9)
+        self.robot_x1 = robot_x1[index1]
+        self.robot_y1 = robot_y1[index1]
+
 
 
     def robot_coordinates_update(self):
@@ -169,7 +194,9 @@ class fussball_roboter:
     
     
     def reset(self):
-        self.robot_x, self.robot_y = (self.HEIGHT // 2)-100, (self.WIDTH // 2)
+
+        self.spawn_entity()
+        #self.robot_x, self.robot_y = (self.HEIGHT // 2)-100, (self.WIDTH // 2)
         self.current_angle = 0
         self.current_speed = 0
         self.ball = Ball(self.HEIGHT // 2, self.WIDTH // 2, 0, 0,self.HEIGHT // 2, self.WIDTH // 2)
@@ -187,7 +214,7 @@ class fussball_roboter:
         self.prev_robot_y = 0
 
 
-        self.robot_x1, self.robot_y1 = (self.HEIGHT // 2)+100, (self.WIDTH // 2)
+        #self.robot_x1, self.robot_y1 = (self.HEIGHT // 2)+100, (self.WIDTH // 2)
         self.current_angle1 = 0
         self.current_speed1 = 0
         self.direction1 = Direction.NONE
@@ -201,12 +228,14 @@ class fussball_roboter:
     def _move(self, direction):
 
 
-        if np.array_equal(direction, [1,0,0]):
+        if np.array_equal(direction, [1,0,0,0]):
             new_dir = Direction.STRAIGHT
-        elif np.array_equal(direction, [0,1,0]):
+        elif np.array_equal(direction, [0,1,0,0]):
             new_dir = Direction.RIGHT
-        elif np.array_equal(direction, [0,0,1]):
+        elif np.array_equal(direction, [0,0,1,0]):
             new_dir = Direction.LEFT
+        elif np.array_equal(direction, [0,0,0,1]):
+            new_dir = Direction.BACKWARD
         else:
             new_dir = Direction.NONE
         
@@ -217,10 +246,12 @@ class fussball_roboter:
         elif self.direction == Direction.LEFT:
             self.current_angle += 4
         elif self.direction == Direction.STRAIGHT:
-            self.current_speed += 0.2            
+            self.current_speed += 0.2 
+        elif self.direction == Direction.BACKWARD:
+            self.current_speed -= 0.8            
 
-        if abs(self.current_speed)>=0.8:
-            self.current_speed=math.copysign(0.8,self.current_speed)
+        if abs(self.current_speed) >= 0.8:
+            self.current_speed = math.copysign(0.8,self.current_speed)
         #print("phi="+str(self.current_angle))
         self.current_angle%=360
 
@@ -241,12 +272,14 @@ class fussball_roboter:
 
     def _move1(self, direction1):
 
-        if np.array_equal(direction1, [1,0,0]):
+        if np.array_equal(direction1, [1,0,0,0]):
             new_dir1 = Direction.STRAIGHT
-        elif np.array_equal(direction1, [0,1,0]):
+        elif np.array_equal(direction1, [0,1,0,0]):
             new_dir1 = Direction.RIGHT
-        elif np.array_equal(direction1, [0,0,1]):
+        elif np.array_equal(direction1, [0,0,1,0]):
             new_dir1 = Direction.LEFT
+        elif np.array_equal(direction1, [0,0,0,1]):
+            new_dir1 = Direction.BACKWARD
         else:
             new_dir1 = Direction.NONE
         
@@ -259,6 +292,8 @@ class fussball_roboter:
             self.current_angle1 -= 4
         elif self.direction1 == Direction.STRAIGHT:
             self.current_speed1 += 0.2
+        elif self.direction1 == Direction.BACKWARD:
+            self.current_speed1 -= 0.2 
 
         if abs(self.current_speed1)>=0.8:
             self.current_speed1 = math.copysign(0.8,self.current_speed1)
@@ -271,11 +306,14 @@ class fussball_roboter:
         self.ball.score_goal(910,0,217,175,5,self.ball_radius)
 
         if self.ball.right_goal_scored or self.ball.left_goal_scored:
-            self.robot_x, self.robot_y = (self.HEIGHT // 2)-50, (self.WIDTH // 2)
+            self.spawn_entity()
+            #self.robot_x, self.robot_y = (self.HEIGHT // 2)-100, (self.WIDTH // 2)
             self.current_angle = 0
+            self.current_speed = 0
 
-            self.robot_x1, self.robot_y1 = (self.HEIGHT // 2)+50, (self.WIDTH // 2)
+            #self.robot_x1, self.robot_y1 = (self.HEIGHT // 2)+100, (self.WIDTH // 2)
             self.current_angle1 = 0
+            self.current_speed1 = 0
 
             self.ball.right_goal_scored = False
             self.ball.left_goal_scored = False
@@ -304,11 +342,11 @@ class fussball_roboter:
             return reward, game_over, self.ball.left_team_score
     
         if self.ball.right_goal_scored:    
-            reward = 100
+            reward = 1000
         elif self.ball.left_goal_scored:
-            reward = -100
+            reward = -500
         elif self.ball.robot_ball_kollision:
-            reward = 10
+            reward = 100
             self.ball.robot_ball_kollision = False
         elif self.out_of_bounds(self.robot_x,self.robot_y,self.HEIGHT,self.WIDTH):
             reward = -10
@@ -317,7 +355,7 @@ class fussball_roboter:
         
         # 5. update ui and clock
         self._update_ui()
-        self.clock.tick(40)
+        self.clock.tick(1000)
         # 6. return game over and score
         return reward, game_over, self.ball.left_team_score
     
@@ -344,20 +382,20 @@ class fussball_roboter:
             return reward1, game_over1, self.ball.right_team_score
     
         if self.ball.right_goal_scored:    
-            reward1 = -100
+            reward1 = -500
         elif self.ball.left_goal_scored:
-            reward1 = 100
+            reward1 = 1000
         elif self.ball.robot_ball_kollision:
-            reward = 10
+            reward1 = 100
             self.ball.robot_ball_kollision = False
         elif self.out_of_bounds(self.robot_x1,self.robot_y1,self.HEIGHT,self.WIDTH):
-            reward = -10
+            reward1 = -10
         elif self.r_r_collision_b:
             reward1 = -10
         
         # 5. update ui and clock
         self._update_ui()
-        self.clock.tick(40)
+        self.clock.tick(1000)
         # 6. return game over and score
         return reward1, game_over1, self.ball.right_team_score
     
@@ -424,23 +462,10 @@ class fussball_roboter:
     
 
         # Regulate the frames per second
-        self.clock.tick(40)
+        self.clock.tick(1000)
     
     
     
-    
-    # integrate it into the update_ui function
-    def goal_score_reset(self):
-        if self.ball.right_goal_scored or self.ball.left_goal_scored:
-            self.robot_x, self.robot_y = (self.HEIGHT // 2)-50, (self.WIDTH // 2)
-            self.current_angle = 0
-            self.robot_x1, self.robot_y1 = (self.HEIGHT // 2)+50, (self.WIDTH // 2)
-            self.current_angle1 = 0
-            self.ball.right_goal_scored = False
-            self.ball.left_goal_scored = False
-
-
-
 
     # --------------- for display ------------------
     
