@@ -8,7 +8,7 @@ from helper import plot
 from ball_Modell_enhanced import Ball
 
 MAX_MEMORY = 200_000
-BATCH_SIZE = 2000
+BATCH_SIZE = 1000
 LR = 0.001
 
 class Agent:
