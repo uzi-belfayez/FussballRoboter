@@ -338,7 +338,7 @@ class fussball_roboter:
         
         if self.frame_iteration > 100:
             game_over = True
-            reward = -10
+            reward = -50
             return reward, game_over, self.ball.left_team_score
     
         if self.ball.right_goal_scored:    
@@ -353,6 +353,7 @@ class fussball_roboter:
         elif self.r_r_collision_b:
             reward = -10
         
+        print ("reward = " , reward)
         # 5. update ui and clock
         self._update_ui()
         self.clock.tick(1000)
@@ -393,6 +394,7 @@ class fussball_roboter:
         elif self.r_r_collision_b:
             reward1 = -10
         
+        print ("reward1 = " , reward1)
         # 5. update ui and clock
         self._update_ui()
         self.clock.tick(1000)
