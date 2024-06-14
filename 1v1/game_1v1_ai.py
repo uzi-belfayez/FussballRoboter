@@ -356,7 +356,7 @@ class fussball_roboter:
         print ("reward = " , reward)
         # 5. update ui and clock
         self._update_ui()
-        self.clock.tick(1000)
+        self.clock.tick(40)
         # 6. return game over and score
         return reward, game_over, self.ball.left_team_score
     
@@ -397,7 +397,7 @@ class fussball_roboter:
         print ("reward1 = " , reward1)
         # 5. update ui and clock
         self._update_ui()
-        self.clock.tick(1000)
+        self.clock.tick(40)
         # 6. return game over and score
         return reward1, game_over1, self.ball.right_team_score
     
@@ -464,7 +464,7 @@ class fussball_roboter:
     
 
         # Regulate the frames per second
-        self.clock.tick(1000)
+        self.clock.tick(40)
     
     
     

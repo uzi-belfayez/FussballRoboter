@@ -17,9 +17,9 @@ class Agent:
         self.epsilon = 0
         self.gamma = 0.95
         self.memory = deque(maxlen=MAX_MEMORY)
-        self.model = Linear_QNet(13, 256, 4)
+        self.model = Linear_QNet(11, 256, 4)
         self.trainer = QTrainer(self.model, lr=LR, gamma=self.gamma)
-        self.model1 = Linear_QNet(13, 256, 4)
+        self.model1 = Linear_QNet(11, 256, 4)
         self.trainer1 = QTrainer(self.model1, lr=LR, gamma=self.gamma)
 
     def get_state(self, fussball_roboter):
@@ -31,23 +31,42 @@ class Agent:
 
         state = [
         #goal location
-        fussball_roboter.robot_y < 217, # goal is on the right
-        fussball_roboter.robot_y > 217,  # goal is on the left       
+        fussball_roboter.robot_y , 
+        fussball_roboter.robot_y ,       
         # Move direction
         dir_l,
         dir_r,
         dir_u,
         #ball location 
-        fussball_roboter.ball.position[1] > fussball_roboter.robot_y, # ball is on the right
-        fussball_roboter.ball.position[1] < fussball_roboter.robot_y, # ball is on the left
-        fussball_roboter.ball.position[0] > fussball_roboter.robot_x, # ball is in front of the robot
-        fussball_roboter.ball.position[0] < fussball_roboter.robot_x, # ball is behind the robot
+        fussball_roboter.ball.position[1] , 
+        fussball_roboter.ball.position[0] , 
         fussball_roboter.robot_x1,
         fussball_roboter.robot_y1,
         fussball_roboter.current_speed,
         fussball_roboter.current_angle
 
         ]
+
+        #state = [
+        ##goal location
+        #fussball_roboter.robot_y < 217, # goal is on the right
+        #fussball_roboter.robot_y > 217,  # goal is on the left       
+        ## Move direction
+        #dir_l,
+        #dir_r,
+        #dir_u,
+        ##ball location 
+        #fussball_roboter.ball.position[1] > fussball_roboter.robot_y, # ball is on the right
+        #fussball_roboter.ball.position[1] < fussball_roboter.robot_y,# ball is on the left
+        #fussball_roboter.ball.position[0] > fussball_roboter.robot_x, # ball is in front of the robot
+        #fussball_roboter.ball.position[0] < fussball_roboter.robot_x, # ball is behind the robot
+        #fussball_roboter.robot_x1,
+        #fussball_roboter.robot_y1,
+        #fussball_roboter.current_speed,
+        #fussball_roboter.current_angle
+        #]
+
+
         return np.array(state, dtype=int)
     
     def get_state1(self, fussball_roboter):
@@ -59,23 +78,42 @@ class Agent:
 
         state1 = [
         #goal location
-        fussball_roboter.robot_y1 < 217, # goal is on the right
-        fussball_roboter.robot_y1 > 217,  # goal is on the left       
+        fussball_roboter.robot_y1 , 
+        fussball_roboter.robot_y1 ,         
         # Move direction
         dir_l1,
         dir_r1,
         dir_u1,
         #ball location 
-        fussball_roboter.ball.position[1] > fussball_roboter.robot_y1, # ball is on the right
-        fussball_roboter.ball.position[1] < fussball_roboter.robot_y1, # ball is on the left
-        fussball_roboter.ball.position[0] > fussball_roboter.robot_x1, # ball is in front of the robot
-        fussball_roboter.ball.position[0] < fussball_roboter.robot_x1, # ball is behind the robot
+        fussball_roboter.ball.position[1] ,  
+        fussball_roboter.ball.position[0] , 
         fussball_roboter.robot_x,
         fussball_roboter.robot_y,
         fussball_roboter.current_speed1,
         fussball_roboter.current_angle1
 
         ]
+
+        #state = [
+        ##goal location
+        #fussball_roboter.robot_y1 < 217, # goal is on the right
+        #fussball_roboter.robot_y1 > 217,  # goal is on the left       
+        ## Move direction
+        #dir_l1,
+        #dir_r1,
+        #dir_u1,
+        ##ball location 
+        #fussball_roboter.ball.position[1] > fussball_roboter.robot_y1, # ball is on the right
+        #fussball_roboter.ball.position[1] < fussball_roboter.robot_y1,# ball is on the left
+        #fussball_roboter.ball.position[0] > fussball_roboter.robot_x1, # ball is in front of the robot
+        #fussball_roboter.ball.position[0] < fussball_roboter.robot_x1, # ball is behind the robot
+        #fussball_roboter.robot_x,
+        #fussball_roboter.robot_y,
+        #fussball_roboter.current_speed1,
+        #fussball_roboter.current_angle1
+        #]
+
+
         return np.array(state1, dtype=int)
     
 
