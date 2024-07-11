@@ -28,9 +28,9 @@ class Ball:
         self.Mr = 0.6  # Robot Mass
         
 
-        self.e_w= 0.95 # Energy loss coefficient during collision with the wall.
-        self.k_rb = 1   # Energy loss coefficient during collision with the robot.
-        self.reibung = 10 * 9.81  # Frictional force. 
+        self.e_w= 0.5 # Energy loss coefficient during collision with the wall.
+        self.k_rb = 0.95   # Energy loss coefficient during collision with the robot.
+        self.reibung = 5 * 9.81  # Frictional force. 
         self.position = np.array([x, y], dtype=float)  # Initial position.
         self.geschwindigkeit = np.array([vx, vy], dtype=float)  # Initial velocity.
         
@@ -39,13 +39,20 @@ class Ball:
     	
         # Calculate and apply friction in the x- and y-directions.
         reibung_x = signum_block(round(self.geschwindigkeit[0],1)) * self.reibung * np.abs(np.cos(winkel_b))
-        reibung_y = signum_block(round(self.geschwindigkeit[1],1)) * self.reibung * np.abs(np.sin(winkel_b))
+        reibung_y = signum_block(round(self.geschwindigkeit[1],1)) * self.reibung * 1# np.abs(np.sin(winkel_b)) removed this cause the ball would never get friction on the Y axis
 
         # Update the position of the ball based on velocity and friction.
         self.geschwindigkeit[0] -= reibung_x * dt 
-        self.geschwindigkeit[1] -= reibung_y * dt 
+        self.geschwindigkeit[1] -= reibung_y * dt
+        # putting dead zones
+        if abs(self.geschwindigkeit[0])<4: 
+            self.geschwindigkeit[0]=0
+        if abs(self.geschwindigkeit[1])<4:
+            self.geschwindigkeit[1]=0
+
         self.position[0] += self.geschwindigkeit[0]*dt
         self.position[1] += self.geschwindigkeit[1]*dt
+
        
         # Check and adjust the ball position if it touches the borders.
         if self.position[0] + ball_radius > HEIGHT:

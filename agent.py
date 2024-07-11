@@ -5,9 +5,14 @@ import numpy as np
 
 from game_fussball_roboter_ai import fussball_roboter
 from model import Linear_QNet, Q_Trainer
-from helper import plot
+from helper import plot,plot_rewards
 import os
-possible_actions = [[1, 0, 0], [0, 1, 0], [0, 0, 1],[0, 0 ,0],[0, -1 ,0]]
+possible_actions = [[1, 0, 0],#rotate left
+                    [0, 1, 0],#forward
+                    [0, 0, 1],#rotate right
+                    [0, 0 ,0],#do nothing
+                    [0,-1 ,0] #reduce speed until stop (brake)
+                    ]
 # Initialize Q(s,a) arbitrarily
 # Repeat (for each generation):
 # 	Initialize state s
@@ -19,7 +24,7 @@ possible_actions = [[1, 0, 0], [0, 1, 0], [0, 0, 1],[0, 0 ,0],[0, -1 ,0]]
 
 MAX_MEMORY = 100_000
 BATCH_SIZE = 1000
-LR =0.02
+LR =0.01
 
 # Save the current learning rate to a file
 def save_learning_rate(learning_rate, filename='./model/learning_rate.txt'):
@@ -36,11 +41,11 @@ def load_learning_rate(filename='./model/learning_rate.txt'):
     return learning_rate
 
 class Agent:
-    def __init__(self,file_name='model.pth',n_inputs=10,n_hidden=256,n_outputs=5,learning_rate=0.1,device='cpu') -> None:
+    def __init__(self,file_name='model.pth',n_inputs=10,n_hidden=128,n_outputs=5,learning_rate=0.1,device='cpu') -> None:
         self.n_games = 0
 
         #randomness
-        self.epsilon = 0.4
+        self.epsilon = 0.5
         self.epsilon_decay = 0.995 
         #learning rate
         self.alpha=learning_rate
@@ -56,7 +61,7 @@ class Agent:
         full_path = os.path.join(model_folder_path,file_name)
         if os.path.exists(full_path):
             # Load model
-            self.model = Linear_QNet.load(full_path, device)
+            self.model = Linear_QNet.load(full_path,n_inputs, n_hidden, n_outputs, device)
             print("Model loaded successfully!")
         else:
             print(f"Model file '{file_name}' not found. Training new model...")
@@ -103,10 +108,24 @@ class Agent:
 
         return action
                 
+def format(vision:list):
+    print("ROBOT")
+    print("Coordinates:",(vision[0],vision[1]))
+    print("Current angle:",vision[2])
+    print("Current speed:",vision[3])
+    print("\nBALL")
+    print("Ball coordinates:",(vision[4],vision[5]))
+    print("Ball distance:",vision[6])
+    print("Ball angle:",vision[7])
+    print("\nGOAL")
+    print("Goal distance:",vision[8])
+    print("Goal angle:",vision[9])
 
 def train():
     plot_scores=[]
     plot_mean_scores=[]
+    plot_positive_rewards=[]
+    plot_negative_rewards=[]
     total_score=0
         # Check if CUDA is available
     if torch.cuda.is_available():
@@ -132,6 +151,9 @@ def train():
         print(f"Parameter {name} is on device: {param.device}")
     record=0
     game=fussball_roboter()
+    accumulated_negative_reward=0
+    accumulated_positive_reward=0
+    
     while True:
         #get old state
         state=agent.get_state(game)
@@ -140,11 +162,18 @@ def train():
         # perform action
         reward,done,score=game.play_step(action)
         # get new state
+        if reward>0:
+            # print(reward)
+            accumulated_positive_reward+=reward
+        elif reward<0:
+            # print(reward)
+            accumulated_negative_reward+=reward
         next_state=agent.get_state(game)
         #train short memory
         agent.train_short_memory(state,action,reward,next_state,done)
         # remember
         agent.remember(state, action, reward, next_state, done)
+        # last_vision=game.vision()
         if done:
             game.reset()
             agent.n_games+=1
@@ -175,7 +204,12 @@ def train():
             total_score+=score
             mean_score=total_score/agent.n_games
             plot_mean_scores.append(mean_score)
+            plot_positive_rewards+=[accumulated_positive_reward]
+            plot_negative_rewards+=[accumulated_negative_reward]
             plot(plot_scores,plot_mean_scores)
+            plot_rewards(plot_positive_rewards,plot_negative_rewards)
+            # format(last_vision)
+            # input("Press Enter to continue...")
 
 
 

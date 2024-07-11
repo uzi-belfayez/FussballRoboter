@@ -6,6 +6,7 @@ from spannung_steuerun import Steuerung
 from ball_Modell import Ball
 import matplotlib.pyplot as plt
 from enum import Enum
+from random import randint
 
 # --- Pygame Initialization and configuration ---
 pygame.init()
@@ -63,8 +64,10 @@ class fussball_roboter:
         self.goal_y=217
         self.height=175
         self.width=5
+        random_ball_xy=(randint(self.HEIGHT // 2+100, self.HEIGHT -100),randint(50, self.WIDTH-50))
+        print(self.HEIGHT // 2+100)
         # Initializing the ball 
-        self.ball = Ball(self.HEIGHT // 2, self.WIDTH // 2, 0, 0,self.HEIGHT // 2, self.WIDTH // 2)
+        self.ball = Ball(*random_ball_xy, 0,0,self.HEIGHT // 2, self.WIDTH // 2)
 
         self.running = True
         self.current_angle = 0
@@ -124,6 +127,7 @@ class fussball_roboter:
     def robot_coordinates_update(self):
         self.prev_robot_x=self.robot_x
         self.prev_robot_y=self.robot_y
+        
 
         self.robot_x += self.geschwindigkeit_umrechnen(self.current_speed) *self.dt * np.cos(np.radians(self.current_angle))
         self.robot_y -= self.geschwindigkeit_umrechnen(self.current_speed) *self.dt *np.sin(np.radians(self.current_angle))
@@ -144,8 +148,10 @@ class fussball_roboter:
 
         for (x,y) in self.point_list:
             if self.out_of_bounds(x,y,self.HEIGHT,self.WIDTH):
+                print("here")
                 self.robot_x=self.prev_robot_x
                 self.robot_y=self.prev_robot_y
+                self.current_angle=self.previous_angle
     
     
     def reset(self):
@@ -163,12 +169,12 @@ class fussball_roboter:
     def _move(self):
           
         self.current_speed+= 0.2*(self.key_state[pygame.K_UP]-self.key_state[pygame.K_DOWN])
-        
+        self.previous_angle=self.current_angle
         self.current_angle+= 4*(self.key_state[pygame.K_LEFT]-self.key_state[pygame.K_RIGHT])
         
         if self.current_speed>=0.8:
             self.current_speed=0.8
-        if self.current_speed<0:
+        if self.current_speed<0 or self.key_state[pygame.K_UP]+self.key_state[pygame.K_DOWN]==0:
             self.current_speed=0
             
         
@@ -209,7 +215,7 @@ class fussball_roboter:
         
         # 5. update ui and clock
         self._update_ui()
-        self.clock.tick(600)
+        self.clock.tick(60)
         # 6. return game over and score
         return self.ball.left_team_score, self.ball.right_team_score
     
@@ -235,7 +241,8 @@ class fussball_roboter:
         # Collision detection and response
         self.robot_vx = self.geschwindigkeit_umrechnen(self.current_speed) * self.dt * np.cos(np.radians(self.current_angle))
         self.robot_vy = -self.geschwindigkeit_umrechnen(self.current_speed) *self.dt * np.sin(np.radians(self.current_angle))
-        self.ball.kollision_detektion(self.dt, self.ball_radius, self.robot_x, self.robot_y, self.robot_width, self.robot_height, self.current_angle, 10*self.robot_vx, 10*self.robot_vy)
+
+        self.ball.kollision_detektion(self.dt, self.ball_radius, self.robot_x, self.robot_y, self.robot_width, self.robot_height, self.current_angle, 20*self.robot_vx, 20*self.robot_vy)
     
 
 
@@ -264,8 +271,7 @@ class fussball_roboter:
 
 
         pygame.display.flip()  # Updating Displays
-        
-    
+      
 
         # Regulate the frames per second
 
@@ -298,7 +304,7 @@ if __name__ == '__main__':
     # game loop
     while True:
         game.play_step()
-        print(len(game.vision()))
+     
         # print("goal angle:",dict['goal angle'])
         
         

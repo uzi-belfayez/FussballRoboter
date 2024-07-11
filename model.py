@@ -11,12 +11,11 @@ class Linear_QNet(nn.Module):
         self.device=device
         self.to(device)
         self.linear1=nn.Linear(n_inputs,n_hidden).to(device)
-        self.linear2=nn.Linear(n_hidden,n_hidden).to(device)
-        
+        # self.linear2=nn.Linear(n_hidden,n_hidden).to(device)
         self.linear3=nn.Linear(n_hidden,n_output).to(device)
     def forward(self,x):
         x = F.relu(self.linear1(x))
-        x = F.relu(self.linear2(x))
+        # x = F.relu(self.linear2(x))
         x = self.linear3(x)
         return x
     def save(self, file_name="model.pth"):
@@ -27,9 +26,9 @@ class Linear_QNet(nn.Module):
         torch.save(self.state_dict(),full_path)
     
     @staticmethod
-    def load(file_path, device='cpu'):
+    def load(file_path,n_inputs, n_hidden, n_outputs, device='cpu'):
         if os.path.exists(file_path):
-            model = Linear_QNet(device=device)  # Create an instance of the model
+            model = Linear_QNet(n_inputs, n_hidden, n_outputs,device)  # Create an instance of the model
             model.load_state_dict(torch.load(file_path, map_location=device))
             model.to(device)  # Move model to the specified device
             return model
