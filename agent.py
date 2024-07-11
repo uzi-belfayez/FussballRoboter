@@ -45,7 +45,7 @@ class Agent:
         self.n_games = 0
 
         #randomness
-        self.epsilon = 0.5
+        self.epsilon = 0.8
         self.epsilon_decay = 0.995 
         #learning rate
         self.alpha=learning_rate

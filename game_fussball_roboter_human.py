@@ -185,13 +185,13 @@ class fussball_roboter:
         self.robot_coordinates_update()
         #self.robot_wall_collision()
 
-        self.ball.score_goal(self.home_goal_x, self.away_goal_x, self.goal_y, self.height, self.width,self.ball_radius)
+        # self.ball.score_goal(self.home_goal_x, self.away_goal_x, self.goal_y, self.height, self.width,self.ball_radius)
         
-        if self.ball.right_goal_scored or self.ball.left_goal_scored:
-            self.robot_x, self.robot_y = (self.HEIGHT // 2)-50, (self.WIDTH // 2)
-            self.current_angle = 0
-            self.ball.right_goal_scored = False
-            self.ball.left_goal_scored = False
+        # if self.ball.right_goal_scored or self.ball.left_goal_scored:
+        #     self.robot_x, self.robot_y = (self.HEIGHT // 2)-50, (self.WIDTH // 2)
+        #     self.current_angle = 0
+        #     self.ball.right_goal_scored = False
+        #     self.ball.left_goal_scored = False
 
           
 

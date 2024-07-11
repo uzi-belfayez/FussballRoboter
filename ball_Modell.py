@@ -197,6 +197,7 @@ class Ball:
                 self.right_goal_scored = True
             elif (self.position[0]+ball_radius > right_goal_x) & (self.position[1]+ball_radius > goal_y) & (self.position[1]+ball_radius < (goal_y + height)):
                 print("Goal scored by left team")
+                print("HERE!")
                 self.left_team_score = self.left_team_score + 1
                 self.position[0] = self.initial_x
                 self.position[1] = self.initial_y

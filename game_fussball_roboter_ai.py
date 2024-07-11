@@ -140,9 +140,10 @@ class fussball_roboter:
         self.current_speed = 0
 
         # random ball positions added to make the model less dumb
-        random_ball_xy=(random.randint(self.HEIGHT // 2+100, self.HEIGHT -100),random.randint(50, self.WIDTH-50))
-        self.ball = Ball(*random_ball_xy, 0,0,self.HEIGHT // 2, self.WIDTH // 2)
-        #self.ball = Ball(self.HEIGHT // 2, self.WIDTH // 2, 0,0,self.HEIGHT // 2, self.WIDTH // 2)
+        # random_ball_xy=(random.randint(self.HEIGHT // 2+100, self.HEIGHT -100),random.randint(50, self.WIDTH-50))
+        # self.ball = Ball(*random_ball_xy, 0,0,self.HEIGHT // 2, self.WIDTH // 2)
+        
+        self.ball = Ball(self.HEIGHT // 2, self.WIDTH // 2, 0,0,self.HEIGHT // 2, self.WIDTH // 2)
 
 
         self.running = True
@@ -200,12 +201,14 @@ class fussball_roboter:
         self.ball.score_goal(self.home_goal_x, self.away_goal_x, self.goal_y, self.height, self.width,self.ball_radius)
         if self.ball.right_goal_scored:
             game_over = True
-            reward = 10000
+            
+            reward = -20000
             return reward, game_over, self.ball.right_goal_scored
         
         if self.ball.left_goal_scored:
             game_over = True
-            reward = -20000
+            print("REWARD ALL G NIGGA")
+            reward = 10000
             return reward, game_over, self.ball.right_goal_scored
         
         if self.frame_iteration > 600:
