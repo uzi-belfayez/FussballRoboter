@@ -41,11 +41,11 @@ def load_learning_rate(filename='./model/learning_rate.txt'):
     return learning_rate
 
 class Agent:
-    def __init__(self,file_name='model.pth',n_inputs=10,n_hidden=128,n_outputs=5,learning_rate=0.1,device='cpu') -> None:
+    def __init__(self,file_name='model.pth',n_inputs=10,n_hidden=50,n_outputs=5,learning_rate=0.1,device='cpu') -> None:
         self.n_games = 0
 
         #randomness
-        self.epsilon = 0.8
+        self.epsilon = 0
         self.epsilon_decay = 0.995 
         #learning rate
         self.alpha=learning_rate
@@ -161,6 +161,7 @@ def train():
         action=agent.get_action(state)
         # perform action
         reward,done,score=game.play_step(action)
+        # game.print_vision()
         # get new state
         if reward>0:
             # print(reward)
@@ -182,7 +183,7 @@ def train():
             agent.train_long_memory()
             if agent.n_games%10==0:
                 agent.model.save()
-                print("Model saved!")
+                # print("Model saved!")
             if score>record and score>0:
                 record=score
                 agent.model.save()
@@ -191,7 +192,6 @@ def train():
                 save_learning_rate(agent.alpha)
                 print("Learning rate saved!")
             print('Game', agent.n_games, 'Score', score, 'Record:', record,'Epsilon:',agent.epsilon,'Alpha:',agent.alpha)
-            
             print('Total actions taken: ',agent.n_random_actions+agent.n_best_possible_actions)
             print('Random actions taken: ',agent.n_random_actions)
             print('Best actions taken: ',agent.n_best_possible_actions)

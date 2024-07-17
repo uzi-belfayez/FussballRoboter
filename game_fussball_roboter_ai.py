@@ -102,8 +102,17 @@ class fussball_roboter:
             goal_distance,#distance to goal
             math.degrees(math.asin((self.robot_y-goal_position[1])/goal_distance))%360#angle to goal
         ]
-        return vision     
-        
+        return vision
+    def print_vision(self):
+        vis=self.vision()
+        print("Coordinates:",vis[0],vis[1])
+        print("Current angle:",vis[2])
+        print("Speed:",vis[3])
+        print("Ball Coordinates:",vis[4],vis[5])
+        print("distance to ball:",vis[6])
+        print("angle to ball:",vis[7])   
+        print("distance to goal:",vis[8])
+        print("angle to goal:",vis[9])   
 
     def robot_coordinates_update(self):
         self.prev_robot_x=self.robot_x
@@ -140,10 +149,10 @@ class fussball_roboter:
         self.current_speed = 0
 
         # random ball positions added to make the model less dumb
-        # random_ball_xy=(random.randint(self.HEIGHT // 2+100, self.HEIGHT -100),random.randint(50, self.WIDTH-50))
-        # self.ball = Ball(*random_ball_xy, 0,0,self.HEIGHT // 2, self.WIDTH // 2)
+        random_ball_xy=(random.randint(self.HEIGHT // 2+100, self.HEIGHT -100),random.randint(50, self.WIDTH-50))
+        self.ball = Ball(*random_ball_xy, 0,0,self.HEIGHT // 2, self.WIDTH // 2)
         
-        self.ball = Ball(self.HEIGHT // 2, self.WIDTH // 2, 0,0,self.HEIGHT // 2, self.WIDTH // 2)
+        # self.ball = Ball(self.HEIGHT // 2, self.WIDTH // 2, 0,0,self.HEIGHT // 2, self.WIDTH // 2)
 
 
         self.running = True
@@ -211,7 +220,7 @@ class fussball_roboter:
             reward = 10000
             return reward, game_over, self.ball.right_goal_scored
         
-        if self.frame_iteration > 600:
+        if self.frame_iteration > 1200:
             game_over = True
             reward = -500
             return reward, game_over, self.ball.left_team_score

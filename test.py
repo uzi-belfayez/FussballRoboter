@@ -1,6 +1,10 @@
-(x,y)=(500,600)
+import torch
 
-def test(x, y):
-    print(x,y)
 
-test(*(x,y))
+
+if torch.cuda.is_available():
+    device = torch.device("cuda")          # a CUDA device object
+    print("CUDA is available. Using GPU.")
+else:
+    device = torch.device("cpu")           # a CPU device object
+    print("CUDA is not available. Using CPU.")
